@@ -3,6 +3,7 @@
 
 import MainNav from "./main-sections/nav.jsx";
 import MainSection from "./main-sections/main_section.jsx";
+import AdminSection from "./teacher-sections/admin-section.jsx";
 
 function App() {
   return (
