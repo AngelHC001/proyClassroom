@@ -1,9 +1,54 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import { useState } from "react";
 import LoginContainer from "../components/center_container";
 
+async function OperationLogin(sendData) {
+    try{
+        const response = await fetch('http://localhost:3000/api/login', {
+            method:'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(sendData)
+        });
+        
+        if(!response.ok){
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Algo salio mal');
+        }
+
+        return await response.json();
+    }catch(error){
+        console.error('Error al registrar:', error.message);
+        alert(`Hubo un problema: ${error.message}`);
+    }
+}
+
 function Login(){
+    const [formData, setformData] = useState({mat:'', pass:''});
+
+    const handleChange = (e) =>{
+        const {name, value} = e.target;
+        setformData((prev) => ({
+          ...prev,
+          [name]:value  
+        }));
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const response = await OperationLogin(formData);
+        //datos recuperados
+
+        //si usuario es 0 modo alumno
+        //si usuario es 1 habilitar boton admin
+        //esto se hace en index aqui no
+
+        //console.log(response.message);
+        //recuperar datos de backedn
+        //alert(response.message);
+        //alert(response.usuario);
+    }
+
     return(
         <LoginContainer>
             <div className="card border-0 h-50 text-center">
@@ -11,15 +56,17 @@ function Login(){
                     <h3>Iniciar Sesión</h3>
                 </div>
 
-                <form className="p-3">
+                <form onSubmit={handleSubmit} className="p-3">
                     <div className="input-group mb-3">
-                        <label className="col-form-label me-2" htmlFor="matricula">Matricula:</label>
-                        <input type="text" className="form-control" name="matricula" required/>
+                        <label className="col-form-label me-2" htmlFor="mat">Matricula:</label>
+                        <input className="form-control" type="text" name="mat" 
+                        value={formData.mat} onChange={handleChange} required/>
                     </div>
 
                     <div className="input-group mb-3">
-                        <label className="col-form-label me-2" htmlFor="contraseña">Contraseña:</label>
-                        <input name="contraseña" type="password" className="form-control" required/>
+                        <label className="col-form-label me-2" htmlFor="pass">Contraseña:</label>
+                        <input className="form-control" name="pass" type="password" 
+                        value={formData.pass} onChange={handleChange} required/>
                     </div>
 
                     <button className="btn btn-primary" type="submit">Entrar</button>
@@ -36,44 +83,5 @@ function Login(){
        
     )
 }
-
- /*
-        <div className="container">
-            <div className="row">
-
-          
-
-            <div className="card-signup mt-3">
-                <div className="card text-center">
-                    
-                   
-                    
-                    <div className="card-body">
-                        <form action="" method="post">
-                            <div className="form-group row mb-3">
-                                <label for="usuario" className="col-sm-2 col-form-label">Matricula:</label>
-                                <div className="col-sm-10">
-                                    <input name="matricula" type="text" className="form-control" required/>
-                                </div>  
-                            </div>
-
-                            <div className="form-group row mb-3">
-                                <label for="contraseña" className="col-sm-2 col-form-label">Contraseña:</label>
-                                <div className="col-sm-10">
-                                    <input name="contraseña" type="password" className="form-control" required/>
-                                </div>
-                            </div>
-
-                            <input name="start" type="submit" className="btn btn-primary"/>
-                        </form>
-                    </div>
-
-                  
-
-                </div>
-            </div>  
-
-            </div> 
-        </div> */
 
 export default Login
