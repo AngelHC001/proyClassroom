@@ -1,7 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LoginContainer from "../components/center_container";
+
+import {useAuth} from "./AuthContext.jsx"
+
 
 async function OperationLogin(sendData) {
     try{
@@ -25,6 +28,9 @@ async function OperationLogin(sendData) {
 
 function Login(){
     const [formData, setformData] = useState({mat:'', pass:''});
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
 
     const handleChange = (e) =>{
         const {name, value} = e.target;
@@ -37,16 +43,10 @@ function Login(){
     const handleSubmit = async (e) => {
         e.preventDefault();
         const response = await OperationLogin(formData);
-        //datos recuperados
-
-        //si usuario es 0 modo alumno
-        //si usuario es 1 habilitar boton admin
-        //esto se hace en index aqui no
-
-        //console.log(response.message);
-        //recuperar datos de backedn
-        //alert(response.message);
-        //alert(response.usuario);
+        const userData =  response.usuario;
+        
+        login(userData); //guarda en contexto
+        navigate("/")    //redirige al dashboard
     }
 
     return(

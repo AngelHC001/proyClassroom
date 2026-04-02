@@ -1,33 +1,41 @@
 import React from "react";
+import { useAuth } from "../genUser-sections/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-
-import defaultImg from '../assets/user.png';
-
+const IMGPATH = '../appUserData/';
 
 function ProfileArea(){
+    const { user, logout } = useAuth();  //user es un objeto, recuperado del login
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    }
+
     return(
-        <div className="row text-center">   
+        <div className="row text-center p-2">   
             <div className="col border-end">
-                <h3>$userName </h3>
-                <img className="rounded" src={defaultImg} width="80" height="80" alt="$userProf" />
-                <p>$userMatricula</p>
+                <h3>{user?.nombre}</h3>
+                <img className="rounded" src={IMGPATH + user?.imgPerfil} width="80" height="80" alt="userProfile"/>
+                <p>{user?.matricula}</p>
             </div>
 
-            <div className="col d-flex align-items-center justify-content-center">
-                <form className="mt-3">    
-                    <button className="btn btn-success mb-2" type="submit" formaction="user_pages/my_posts.php">
-                        <i className="bi bi-sticky-fill"></i> Mis Posts
-                    </button>
+            <div className="col mt-3">
+                {user?.tipo === 0 ? 
+                        <>
+                            <button className="btn btn-primary mb-1">Mis Posts</button>
+                            <button className="btn btn-secondary mb-1" type="submit"> Editar Perfil </button>
+                        </>
+                    :   
+                        <button className="btn btn-primary">Administrar</button>
+                }
 
-                    <button className="btn btn-secondary" type="submit"  formaction="user_pages/profile.php"> 
-                        <i className="bi bi-pencil-square"></i> Editar Perfil
-                    </button>
-
-                    <button className="btn btn-danger mt-2" type="submit" formaction="utils/close.php">
-                        <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
-                    </button>
-                </form>      
-            </div>     
+                <button className="btn btn-danger" onClick={handleLogout}>
+                    <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
+                </button>
+            </div>      
+               
         </div>    
     )
 }
@@ -35,41 +43,39 @@ function ProfileArea(){
 
 function PostArea(){
     return(
-        <div class="row">
-            <h5>Publicar</h5>
+        <div className="col p-2">
+            <h3>Publicar</h3>
             
-            <div class="col mb-3">
-                <form action="" method="post" enctype="multipart/form-data">
-                    <input name="titulo" class="form-control mb-2" type="text" placeholder="Titulo"/>
-                    <textarea name="contenido" class="form-control" placeholder="Escribe algo..."></textarea>   
-                        
-                    <div id="archivos"></div>
+            <form encType="multipart/form-data">
+                <input className="form-control mb-2" name="titulo" type="text" placeholder="Titulo"/>
+                <textarea className="form-control" name="contenido"  placeholder="Escribe algo..."></textarea>   
                     
-                    <div class="mt-2 text-end"> 
-                        <button class="btn btn-outline-secondary" title="Retirar Archivos" onclick="cancelaArchivos()">
-                            <i class="bi bi-x-square"></i> 
-                        </button>
-                                
-                        <label class="btn btn-outline-secondary">
-                            <i class="bi bi-paperclip"></i>    
-                            <input id="fichero" name="archivo[]" type="file" multiple title="Adjuntar Archivo"/>
-                        </label>
-    
-                        <button class="btn btn-outline-primary" type="submit"  title="Enviar" name="btnPost">
-                            <i class="bi bi-send"></i>
-                        </button>
-                    </div> 
-                </form>
-            </div>
-
+                <div id="archivos"></div>
+                
+                <br/>
+                
+                <div className="d-flex gap-3"> 
+                    <label className="btn btn-outline-secondary">
+                        <i className="bi bi-paperclip"></i>    
+                        <input name="archivo[]" type="file" multiple title="Adjuntar Archivo"/>
+                    </label>
+                    
+                    <button className="btn btn-outline-danger" title="Deshacer mensaje">
+                        <i className="bi bi-x-square"></i> 
+                    </button>
+                            
+                    <button className="btn btn-outline-primary" type="submit"  title="Enviar">
+                        <i className="bi bi-send"></i>
+                    </button>
+                </div> 
+            </form>
         </div>  
     )
 }
 
-
 function LeftSide(){
     return(
-        <div className="col-md-4">
+        <div className="col-md-4 left-side">
             <ProfileArea/>
             <PostArea/>
         </div>
@@ -77,4 +83,3 @@ function LeftSide(){
 }
 
 export default LeftSide;
-

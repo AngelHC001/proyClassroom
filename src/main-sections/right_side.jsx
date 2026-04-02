@@ -13,28 +13,36 @@ if($res)
 
 */
 
+//QUE INCLUYE RIGHT SIDE?
+//ADMINPAGE DIRIGE A OTRA PAGINA
+//MIS POSTS
+//EDITAR PERFIL
+
+
+
+
 function PostTemplate(){
     return(
-        <div class="row p-2 admin-col-2 d-grid gap-2">
+        <div className="row p-2 admin-col-2 d-grid gap-2">
                                          
-            <div class="container-sm border border-2 border-light rounded bg-dark">
-                <div class="row p-auto border-bottom">
-                    <div class="col-sm-4"> 
+            <div className="container-sm border border-2 border-light rounded bg-dark">
+                <div className="row p-auto border-bottom">
+                    <div className="col-sm-4"> 
                         <h4> $row['titulo']</h4> 
                     </div>
 
-                    <div class="col-sm-8"> 
-                        <p class="text-end">
+                    <div className="col-sm-8"> 
+                        <p className="text-end">
                            <b>$row['usuario']-  $row['fecha_hora']</b>
                         </p>
                     </div>
                 </div>
 
-                <div class="row">
+                <div className="row">
                     <p>$row['contenido']</p>
                 </div>
                                 
-                <div class="d-flex flex-row p-2 justify-content-center">
+                <div className="d-flex flex-row p-2 justify-content-center">
                     {/*php 
                         if($row['archivo'] != null)
                         {   
@@ -46,7 +54,7 @@ function PostTemplate(){
                                 $format = strtolower(substr($f, -3));
                                 if(in_array($format,$images))
                                 { ?>*/}
-                    <div class="flex-column me-2 bg-light text-center rounded">
+                    <div className="flex-column me-2 bg-light text-center rounded">
                         <a href="uploaded_files/<?php echo $f;?>" download="<?php echo $f;?>" >
                             <img class="rounded" src="uploaded_files/<?php echo $f;?>" width="80" height="80"/>
                         </a>
@@ -56,14 +64,14 @@ function PostTemplate(){
                                 }
                                 else
                                 { ?>*/}
-                    <div class="flex-column me-2 bg-light text-center rounded">
+                    <div className="flex-column me-2 bg-light text-center rounded">
                         <a href="uploaded_files/<?php echo $f;?>" download="<?php echo $f;?>" >
                             {/*<?php echo $f?>*/}
                         </a>
                     </div>
                 </div>
                 
-                <div class="p-2 border-top">
+                <div className="p-2 border-top">
                     <form action="" method="get">
                         
                         <button class="btn btn-success btn-sm" name="btnLike">
@@ -89,7 +97,7 @@ function PostTemplate(){
 function RightSide(){
     return(
         <div className="col-md-8">
-            <div class="row p-2 bg-dark rounded">
+            <div className="row p-2 bg-dark rounded">
                 <h2>Publicaciones</h2>
             </div>
 

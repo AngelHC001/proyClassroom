@@ -99,8 +99,8 @@ app.post('/api/login', async(req,res)=>{
             usuario:{
                 nombre: usuario.nombre, 
                 matricula: usuario.matricula,
-                tipo: usuario.tipousuario,
-                imgPerfil: usuario.nombreimg
+                tipo: usuario.tipoUsuario,
+                imgPerfil: usuario.nombreImg
             }
         });
         

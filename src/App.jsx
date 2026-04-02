@@ -6,13 +6,15 @@ import AdminSection from "./teacher-sections/admin-section.jsx";
 import Login from "./genUser-sections/login.jsx";
 import Register from "./genUser-sections/register.jsx";
 
+import {useAuth} from './genUser-sections/AuthContext.jsx'
+
 import './index.css'
 
-
 // Un componente simple para envolver rutas privadas
+//si hay usuario ejecuta MainSection, sino retorna al login
 const PrivateRoute = ({ children }) => {
-  const isAuthenticated = false; // Aquí conectarías tu lógica de Auth (contexto/redux)
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  const user = useAuth();  //Lee contexto de login
+  return user ? children : <Navigate to="/login" />;
 };
 
 function App() {

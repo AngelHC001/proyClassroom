@@ -14,19 +14,25 @@
 }
 
 
+.left-side{
+    max-height: 100vh;
+    overflow-y: hidden;
+}
+
+input[type="file"] {
+    display: none;
+}
+
 
 /*
 #rightbar{
-    max-height: 100vh;
+    
     overflow-y: scroll;
     overflow-x: hidden;
 
     
 }
 
-input[type="file"] {
-    display: none;
-}
 
 
 
