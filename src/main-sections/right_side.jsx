@@ -18,12 +18,16 @@ if($res)
 //MIS POSTS
 //EDITAR PERFIL
 
+import EditSection from "../genUser-sections/edit_profile";
 
 
 
 function PostTemplate(){
     return(
         <div className="row p-2 admin-col-2 d-grid gap-2">
+            <div className="row p-2 bg-primary rounded">
+                <h2>Publicaciones</h2>
+            </div>
                                          
             <div className="container-sm border border-2 border-light rounded bg-dark">
                 <div className="row p-auto border-bottom">
@@ -91,19 +95,18 @@ function PostTemplate(){
 
 }
 
-
-
-
-function RightSide(){
+function RightSide({activeView = ''}){
+    //posts
+    //my_posts
+    //my_profile
+    
     return(
-        <div className="col-md-8">
-            <div className="row p-2 bg-dark rounded">
-                <h2>Publicaciones</h2>
-            </div>
-
-            <PostTemplate/>
-
+        <div className="container-fluid">
+            {activeView === 'posts' &&  <PostTemplate/>}
+            {activeView === 'my_posts' &&  <h1>MIS POSTS COMPONENT</h1>}
+            {activeView === 'my_profile' && <EditSection/>}
         </div>
+       
     )
 }
 

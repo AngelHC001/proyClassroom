@@ -1,12 +1,15 @@
 import React from "react";
 import { useAuth } from "../genUser-sections/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const IMGPATH = '../appUserData/';
 
-function ProfileArea(){
+export function ProfileArea({activeView, setActiveView}){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
     const navigate = useNavigate();
+    
+    const btnLabel = activeView === 'my_posts' ? 'Volver' : 'Mis Posts';
+    const btnLabel2 = activeView === 'my_profile' ? 'Volver' : 'Mi Perfil';
 
     const handleLogout = () => {
         logout();
@@ -21,11 +24,13 @@ function ProfileArea(){
                 <p>{user?.matricula}</p>
             </div>
 
-            <div className="col mt-3">
+            <div className="col d-flex flex-column mt-3">
                 {user?.tipo === 0 ? 
                         <>
-                            <button className="btn btn-primary mb-1">Mis Posts</button>
-                            <button className="btn btn-secondary mb-1" type="submit"> Editar Perfil </button>
+                            <button className="btn btn-primary mb-1" onClick={() => 
+                                setActiveView(activeView === 'my_posts' ? 'posts' : 'my_posts')}>{btnLabel}</button>
+                            <button className="btn btn-secondary mb-1" onClick={() => 
+                                setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>{btnLabel2}</button>
                         </>
                     :   
                         <button className="btn btn-primary">Administrar</button>
@@ -41,7 +46,7 @@ function ProfileArea(){
 }
 
 
-function PostArea(){
+export function PostArea(){
     return(
         <div className="col p-2">
             <h3>Publicar</h3>
@@ -72,14 +77,3 @@ function PostArea(){
         </div>  
     )
 }
-
-function LeftSide(){
-    return(
-        <div className="col-md-4 left-side">
-            <ProfileArea/>
-            <PostArea/>
-        </div>
-    )
-}
-
-export default LeftSide;

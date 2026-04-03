@@ -2,30 +2,22 @@ import React from "react";
 //import { useAuth } from "../genUser-sections/AuthContext";
 import { useState } from "react";
 
-import LeftSide from "./left_side";     //PROFILE AND POST-SUBMIT
+import { ProfileArea, PostArea } from "./left_side";
 import RightSide from "./right_side";   //POSTS AREA
 
 function MainSection(){
-    const [section, setSection] = useState('dashboard')
-
-  
-
-    //const {user} = useAuth();
-
-    //RIGHT SIDE ADQUIERE EL NOMBRE
-    //RIGHT SIDE TIENE EL DICT DE NOMBRES QUE RENDERIZAR
-
-    //dashboard
-    //mypost
-    //edit
-
+    const [activeView, setActiveView] = useState('posts');
 
     return(
-        <main>
-            <div className="container-fluid">
-                <div className="row">
-                    <LeftSide/>
-                    <RightSide/>
+        <main className="container-fluid">
+            <div className="row">
+                <div className="col-md-4">
+                    <ProfileArea activeView={activeView} setActiveView={setActiveView}/>
+                    <PostArea/>
+                </div>
+
+                <div className="col-md-8">
+                    <RightSide activeView={activeView}/>
                 </div>
             </div>
         </main>
