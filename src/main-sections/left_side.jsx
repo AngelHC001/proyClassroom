@@ -18,7 +18,7 @@ export function ProfileArea({activeView, setActiveView}){
 
     return(
         <div className="row text-center p-2">   
-            <div className="col border-end">
+            <div className="col border-dark border-end">
                 <h3>{user?.nombre}</h3>
                 <img className="rounded" src={IMGPATH + user?.imgPerfil} width="80" height="80" alt="userProfile"/>
                 <p>{user?.matricula}</p>
@@ -32,11 +32,13 @@ export function ProfileArea({activeView, setActiveView}){
                             <button className="btn btn-secondary mb-1" onClick={() => 
                                 setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>{btnLabel2}</button>
                         </>
-                    :   
-                        <button className="btn btn-primary">Administrar</button>
+                    :
+                        <Link className="btn btn-outline-light btn-admin mb-1" to="/admin-section">
+                            <i className="bi bi-journal-check"></i> Administrar
+                        </Link>  
                 }
 
-                <button className="btn btn-danger" onClick={handleLogout}>
+                <button className="btn btn-outline-dark" onClick={handleLogout}>
                     <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
                 </button>
             </div>      
@@ -48,8 +50,8 @@ export function ProfileArea({activeView, setActiveView}){
 
 export function PostArea(){
     return(
-        <div className="col p-2">
-            <h3>Publicar</h3>
+        <div className="p-2">
+            <h3 className="display-6">Publicar</h3>
             
             <form encType="multipart/form-data">
                 <input className="form-control mb-2" name="titulo" type="text" placeholder="Titulo"/>
@@ -60,7 +62,7 @@ export function PostArea(){
                 <br/>
                 
                 <div className="d-flex gap-3"> 
-                    <label className="btn btn-outline-secondary">
+                    <label className="btn btn-outline-dark">
                         <i className="bi bi-paperclip"></i>    
                         <input name="archivo[]" type="file" multiple title="Adjuntar Archivo"/>
                     </label>

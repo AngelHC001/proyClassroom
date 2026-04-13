@@ -1,0 +1,25 @@
+/*SECCIONES DEL DASHBOARD*/
+
+.nav-classroom{
+    background-color: rgb(108, 188, 29);
+    border-bottom: rgb(223, 130, 120) 2px solid;
+    border-radius: 0px 0px 2px 2px;
+}
+
+.left-side{
+    background-color: rgb(200, 237, 163);
+}
+
+.right-side{
+    background-color: rgb(236, 155, 146);
+}
+
+.btn-admin{
+    border-color: rgb(192, 90, 79);
+    background-color: salmon;
+}
+
+
+.post{
+    background-color: rgb(156, 209, 103);
+}

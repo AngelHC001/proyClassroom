@@ -46,7 +46,11 @@ function Login(){
         const userData =  response.usuario;
         
         login(userData); //guarda en contexto
-        navigate("/")    //redirige al dashboard
+
+        if(userData.tipoUsuario === 1)
+            navigate('/admin-section');  //MODO ADMIN
+        else
+            navigate("/");               //NORMAL
     }
 
     return(

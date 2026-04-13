@@ -11,12 +11,12 @@ function MainSection(){
     return(
         <main className="container-fluid">
             <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-4 left-side">
                     <ProfileArea activeView={activeView} setActiveView={setActiveView}/>
                     <PostArea/>
                 </div>
 
-                <div className="col-md-8">
+                <div className="col-md-8 right-side">
                     <RightSide activeView={activeView}/>
                 </div>
             </div>

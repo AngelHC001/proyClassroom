@@ -53,13 +53,15 @@ app.post('/api/register', async(req,res) => {
     try{
         //hashear pass
         const hashedPassword = await bcrypt.hash(pass,10);
+        const defaultImg = 'user.png';
         
         //Conexion y consulta  
         await pool.request()
             .input('nombre',sql.NVarChar,name)
             .input('matricula',sql.NVarChar,mat)
             .input('contrasena',sql.NVarChar,hashedPassword)
-            .query('INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO) VALUES (@nombre, @matricula, @contrasena,0)')
+            .input('nombreImg', sql.NVarChar,defaultImg)
+            .query('INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG) VALUES (@nombre, @matricula, @contrasena,0,@nombreImg)')
         
         //Dar positivo
         res.status(201).json({message: 'Registrado con exito, Puedes iniciar sesion'})

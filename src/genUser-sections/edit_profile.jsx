@@ -85,7 +85,7 @@ function ChangeData(){
 
 function EditSection(){
     return(
-        <div className="d-flex justify-content-center mt-5">            
+        <div className="d-flex justify-content-center align-items-center py-5">            
             <div className="row bg-secondary rounded">
                 <h1>Mi Perfil</h1>
                 <hr/>
