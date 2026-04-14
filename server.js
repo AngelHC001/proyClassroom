@@ -99,6 +99,7 @@ app.post('/api/login', async(req,res)=>{
         res.status(200).json({
             message:'Login Exitoso', 
             usuario:{
+                id: usuario.idUsuario,
                 nombre: usuario.nombre, 
                 matricula: usuario.matricula,
                 tipo: usuario.tipoUsuario,
@@ -111,6 +112,80 @@ app.post('/api/login', async(req,res)=>{
         res.status(500).json({message: 'Error interno del servidor'});     
     }
 });
+
+//PUBLICAR INSERT Y DELETE
+app.post('/api/upload_post', async(req,res) => {
+    //recibe datos
+    const {remitent ,title, content, files} = req.body;
+    const date = new Date();
+
+    //Validacion debe haber al menos uno ocupado
+    if(!title && !content && files){
+        return res.status(400).json({ message: 'Todos los campos estan vacios' });
+    }
+
+    try {
+        //mover archivos si hay
+            //CODIGO MOVER A CARPETA (DELEGADO)
+
+        //Preparar consulta (FORMATEAR FECHA DESPUES)
+        let fecha = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        let hora = `${date.getHours()}:${date.getMinutes()}`;
+        let datosRemitente = `${remitent.matricula}-${remitent.nombre}`
+        let idRemitente = remitent.id;
+
+        await pool.request()
+            .input('titulo',sql.NVarChar,title)
+            .input('contenido', sql.NVarChar,content)
+            .input('fechahora',sql.DateTime,`${fecha} ${hora}`)
+            .input('stringfiles',sql.NVarChar,files)
+            .input('remitente',sql.NVarChar,datosRemitente)
+            .input('idUsuario',sql.Int,idRemitente)
+            .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
+                ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
+        
+        //Dar positivo
+        res.status(201).json({message: 'CONCRETADO'})        
+    } catch (error) {
+        console.error('Error en el insert:', error);
+        res.status(500).json({message: 'Error interno del servidor'});     
+    }
+});
+
+//app.delete
+
+//VER PUBLICACIONES (TODAS, MIAS, ADMIN)
+app.post('/api/fetch_posts', async(req,res) => {
+    const { mode, userData } = req.body;
+
+    if(!mode || !userData){
+        return res.status(400).json({ message: 'Sin requisitos de consulta' });
+    }
+    
+    try {
+        const request = await pool.request();
+        let query = "SELECT * FROM POST";
+
+        //MODO MIS POSTS
+        if(mode === 'my_posts'){
+            request.input('idUsuario', sql.Int, userData.id);
+            query += ' WHERE IDUSUARIO = @idUsuario';   
+        }
+        else if(mode === 'user_posts'){
+            request.input('nombre', sql.NVarChar, userData.nombre);
+            query += ' WHERE NOMBRE != @nombre AND TIPOUSUARIO = 1';
+        }
+
+        //DEFAULT GENERAL
+        const result = await request.query(query);
+        return res.status(200).json(result.recordset);
+      
+    } catch (error) {
+        console.error('Algo salio mal al cargar', error);
+        res.status(500).json({message: 'Error interno del servidor'}); 
+    }
+});
+
 
 
 

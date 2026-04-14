@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../genUser-sections/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const IMGPATH = '../appUserData/';
 
@@ -27,10 +28,15 @@ export function ProfileArea({activeView, setActiveView}){
             <div className="col d-flex flex-column mt-3">
                 {user?.tipo === 0 ? 
                         <>
-                            <button className="btn btn-primary mb-1" onClick={() => 
-                                setActiveView(activeView === 'my_posts' ? 'posts' : 'my_posts')}>{btnLabel}</button>
-                            <button className="btn btn-secondary mb-1" onClick={() => 
-                                setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>{btnLabel2}</button>
+                            <button className="btn btn-outline-light btn-admin mb-1" onClick={() => 
+                                setActiveView(activeView === 'my_posts' ? 'posts' : 'my_posts')}>
+                                <i className="bi bi-stickies-fill"></i> {btnLabel}
+                            </button>
+
+                            <button className="btn btn-success mb-1" onClick={() => 
+                                setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>
+                                <i className="bi bi-person-fill"></i> {btnLabel2}
+                            </button>
                         </>
                     :
                         <Link className="btn btn-outline-light btn-admin mb-1" to="/admin-section">
@@ -48,23 +54,60 @@ export function ProfileArea({activeView, setActiveView}){
 }
 
 
+
+
 export function PostArea(){
+    const { user } = useAuth();
+    const [postData,setpostData] = useState({remitent: user, title:'',content:'',files:''});
+    
+    
+    const handleChange = (e) => {
+        const {name,value} = e.target;
+        setpostData((prev) => ({
+            ...prev,
+            [name]:value 
+        }));
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        //HACER REQUEST
+        try {
+            const response = await fetch('http://localhost:3000/api/upload_post',{
+                method:'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(postData)
+            });
+
+            if(!response.ok){
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Algo salio mal');
+            }
+
+            //Resultados
+            const result = await response.json(); 
+            alert(result.message);
+        } catch (error) {
+            console.error('Error al registrar:', error.message);
+            alert(`Hubo un problema: ${error.message}`);
+        }
+    }
+
     return(
         <div className="p-2">
             <h3 className="display-6">Publicar</h3>
             
-            <form encType="multipart/form-data">
-                <input className="form-control mb-2" name="titulo" type="text" placeholder="Titulo"/>
-                <textarea className="form-control" name="contenido"  placeholder="Escribe algo..."></textarea>   
-                    
-                <div id="archivos"></div>
+            <form className="d-flex flex-column gap-2" encType="multipart/form-data" onSubmit={handleSubmit}>
+                <input className="form-control" name="title" type="text" placeholder="Titulo"
+                value={postData.title} onChange={handleChange} />
                 
-                <br/>
+                <textarea className="form-control" name="content" placeholder="Escribe algo..."
+                value={postData.content} onChange={handleChange}/> 
                 
-                <div className="d-flex gap-3"> 
+                <div className="d-flex flex-row gap-3"> 
                     <label className="btn btn-outline-dark">
                         <i className="bi bi-paperclip"></i>    
-                        <input name="archivo[]" type="file" multiple title="Adjuntar Archivo"/>
+                        <input name="files[]" type="file" multiple title="Adjuntar Archivo"/>
                     </label>
                     
                     <button className="btn btn-outline-danger" title="Deshacer mensaje">

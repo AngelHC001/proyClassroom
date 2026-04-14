@@ -13,6 +13,7 @@ function ChangePic(){
     const { user } = useAuth();
     //onSubmit
     //update file
+    //handleChange
 
     return(
         <div className="col-md-6 border-end text-center">
