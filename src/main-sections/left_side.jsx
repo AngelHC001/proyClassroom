@@ -48,7 +48,6 @@ export function ProfileArea({activeView, setActiveView}){
                     <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
                 </button>
             </div>      
-               
         </div>    
     )
 }
@@ -58,8 +57,10 @@ export function ProfileArea({activeView, setActiveView}){
 
 export function PostArea(){
     const { user } = useAuth();
+    const navigate = useNavigate();
+
     const [postData,setpostData] = useState({remitent: user, title:'',content:'',files:''});
-    
+    const [message, setMessage] = useState({color:'secondary', text:''});
     
     const handleChange = (e) => {
         const {name,value} = e.target;
@@ -67,6 +68,10 @@ export function PostArea(){
             ...prev,
             [name]:value 
         }));
+    }
+
+    const clearFields = () =>{
+        setpostData({remitent: user, title:'',content:'',files:''});
     }
 
     const handleSubmit = async (e) => {
@@ -86,16 +91,20 @@ export function PostArea(){
 
             //Resultados
             const result = await response.json(); 
-            alert(result.message);
+            setMessage({color: 'success', text: result.message});
+            clearFields();
+            navigate(0);
+        
         } catch (error) {
             console.error('Error al registrar:', error.message);
-            alert(`Hubo un problema: ${error.message}`);
+            setMessage({color: 'danger', text: 'Error Algo salió mal'});
         }
     }
 
     return(
         <div className="p-2">
-            <h3 className="display-6">Publicar</h3>
+            <h4>Publicar</h4>
+            <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
             
             <form className="d-flex flex-column gap-2" encType="multipart/form-data" onSubmit={handleSubmit}>
                 <input className="form-control" name="title" type="text" placeholder="Titulo"
@@ -110,11 +119,12 @@ export function PostArea(){
                         <input name="files[]" type="file" multiple title="Adjuntar Archivo"/>
                     </label>
                     
-                    <button className="btn btn-outline-danger" title="Deshacer mensaje">
+                    <button className="btn btn-outline-danger" type="button" title="Deshacer mensaje"
+                    onClick={clearFields}>
                         <i className="bi bi-x-square"></i> 
                     </button>
                             
-                    <button className="btn btn-outline-primary" type="submit"  title="Enviar">
+                    <button className="btn btn-outline-primary" type="submit" title="Enviar">
                         <i className="bi bi-send"></i>
                     </button>
                 </div> 

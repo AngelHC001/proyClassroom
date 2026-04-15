@@ -6,9 +6,8 @@ import PostContainer from "../genUser-sections/get_posts";
 import AdminControl from "./admin-control";
 import AdminFiles from "./admin-files";
 
-
 const db_items = [
-     {
+    {
         key: 'admin_item0',
         icon: 'bi bi-people-fill',
         sectionName: 'Control de Usuarios',
@@ -47,7 +46,7 @@ const db_items = [
 
 function AdminLeftBar({setActiveView}){
     return(
-         <div className="col-md-4 left-side text-center p-3">
+        <div className="col-md-4 left-side text-center p-3">
             <h2 className="display-6">Administrar Clase</h2>
             <hr />
                

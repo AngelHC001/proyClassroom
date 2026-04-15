@@ -1,5 +1,4 @@
 import React from "react";
-//import { useAuth } from "../genUser-sections/AuthContext";
 import { useState } from "react";
 
 import { ProfileArea, PostArea } from "./left_side";

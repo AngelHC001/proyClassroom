@@ -1,18 +1,20 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./AuthContext";
 
 import Post from "../components/post-template";
 import SectionHeader from "../components/section-header";
 
-//PUBLICA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
+//LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
 function PostContainer({ mode }){
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
+    const scrollRef = useRef(null);
 
     const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
+    const manageMode = (mode === 'my_posts') || mode === ('user_posts') ? true : false;
 
     useEffect(()=>{    
         const controller = new AbortController();
@@ -38,18 +40,21 @@ function PostContainer({ mode }){
             }
         }
 
+        if (scrollRef.current) {
+            scrollRef.current.scrollBottom = scrollRef.current.scrollHeight;
+        }
         GetPosts();
         return () => controller.abort(); 
     },[mode, user]);
 
     return(
-        <div className="text-light">
+        <div className="text-light" ref={scrollRef}>
             <SectionHeader title={label} iconClass={'journal-check'}/>
-
             <div className="post-space d-flex flex-column gap-2 p-2">
-                {
-                    loading ? <h1>CARGANDO</h1> :
-                        data.map((p) => (<Post key={p?.idPost} PostData={p}/>)) 
+                {   loading ? <h1>CARGANDO</h1> :
+                        data.map((p) => (
+                            <Post key={p?.idPost} PostData={p} context={mode} isManageEnabled={manageMode}/>
+                        )) 
                 } 
                 <br/>        
             </div>

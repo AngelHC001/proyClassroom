@@ -145,14 +145,12 @@ app.post('/api/upload_post', async(req,res) => {
                 ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
         
         //Dar positivo
-        res.status(201).json({message: 'CONCRETADO'})        
+        res.status(201).json({message: 'Se publicó tu post'})        
     } catch (error) {
         console.error('Error en el insert:', error);
         res.status(500).json({message: 'Error interno del servidor'});     
     }
 });
-
-//app.delete
 
 //VER PUBLICACIONES (TODAS, MIAS, ADMIN)
 app.post('/api/fetch_posts', async(req,res) => {
@@ -186,10 +184,41 @@ app.post('/api/fetch_posts', async(req,res) => {
     }
 });
 
+//ELIMINAR POSTS (MIAS Y ADMIN)
+app.delete('/api/erase_post',async(req,res) => {
+    const {mode, postTarget } = req.body;
+
+    if(!mode || !postTarget){
+        return res.status(400).json({ message: 'Sin requisitos de consulta' });
+    }
+
+    try {
+        const request = await pool.request();
+        let query = "DELETE FROM POST WHERE ";
+
+        //MODO MIS POSTS
+        if(mode === 'my_posts'){
+            request.input('idPost', sql.Int, postTarget.idPost)
+            query += 'IDPOST = @idPost';   
+            await request.query(query);
+        }
+        else if(mode === 'user_posts'){
+            request.input('idPost', sql.Int, postTarget.idPost)
+            query += 'IDPOST = @idPost AND TIPOUSUARIO = 1';
+            await request.query(query);
+        }
+
+        return res.status(200).json({message: 'Post Eliminado'});
+    } catch (error) {
+        console.error('Error al borrar el Post', error);
+        res.status(500).json({message: 'Error interno del servidor'}); 
+    }
+});
 
 
 
-//app.delete
+
+
 
 //app.put
 
