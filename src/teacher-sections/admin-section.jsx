@@ -81,11 +81,11 @@ function AdminLeftBar({setActiveView}){
 
 function AdminRightSide({activeView = ''}){
     return(
-        <div className="col-md-8">
+        <div className="col-md-8 right-side">
             {activeView === 'users_control' &&  <AdminControl/>}
             {activeView === 'my_profile' && <EditSection/>}
-            {activeView === 'my_posts' &&  <PostContainer mode={'Mis post Admin'}/>}
-            {activeView === 'manage_posts' &&  <PostContainer mode={'Control Posts'}/>}
+            {activeView === 'my_posts' &&  <PostContainer mode={'my_posts'}/>}
+            {activeView === 'manage_posts' &&  <PostContainer mode={'user_posts'}/>}
             {activeView === 'manage_files' &&  <AdminFiles/>} 
         </div>
     )

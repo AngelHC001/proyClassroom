@@ -25,26 +25,26 @@ export function ProfileArea({activeView, setActiveView}){
                 <p>{user?.matricula}</p>
             </div>
 
-            <div className="col d-flex flex-column mt-3">
+            <div className="col d-flex flex-column gap-2 mt-3">
                 {user?.tipo === 0 ? 
                         <>
-                            <button className="btn btn-outline-light btn-admin mb-1" onClick={() => 
+                            <button className="btn btn-outline-light btn-admin" onClick={() => 
                                 setActiveView(activeView === 'my_posts' ? 'posts' : 'my_posts')}>
                                 <i className="bi bi-stickies-fill"></i> {btnLabel}
                             </button>
 
-                            <button className="btn btn-success mb-1" onClick={() => 
+                            <button className="btn btn-success" onClick={() => 
                                 setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>
                                 <i className="bi bi-person-fill"></i> {btnLabel2}
                             </button>
                         </>
                     :
-                        <Link className="btn btn-outline-light btn-admin mb-1" to="/admin-section">
+                        <Link className="btn btn-outline-light btn-admin" to="/admin-section">
                             <i className="bi bi-journal-check"></i> Administrar
                         </Link>  
                 }
 
-                <button className="btn btn-outline-dark" onClick={handleLogout}>
+                <button className="btn btn-dark" onClick={handleLogout}>
                     <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
                 </button>
             </div>      

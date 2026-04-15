@@ -31,7 +31,7 @@ function Post({PostData}){
     //))
 
     return(
-        <div className="card border-0 post text-light">
+        <div className="card border-0 post text-light me-2">
             <div className="card-header border-light d-flex justify-content-between align-items-center">
                 <h3>{PostData?.titulo}</h3>
 

@@ -1,6 +1,7 @@
 import React from "react";
 
 import {useAuth} from './AuthContext.jsx'
+import SectionHeader from "../components/section-header.jsx";
 
 const IMGPATH = '../appUserData/';
 
@@ -17,8 +18,8 @@ function ChangePic(){
 
     return(
         <div className="col-md-6 border-end text-center">
-            <h2>{user?.nombre}</h2>      
-            <img className="rounded mb-2" src={IMGPATH + user?.imgPerfil} width="120" height="120"/>
+            <h1>{user?.nombre}</h1>      
+            <img className="rounded mb-3" src={IMGPATH + user?.imgPerfil} width="150" height="150"/>
                
             <form encType="multipart/form-data">
                 <label className="btn btn-primary me-2">
@@ -50,7 +51,7 @@ function ChangeData(){
 
     return(
         <div className="col-md-6">
-            <h2>Editar</h2>
+            <h1>Editar</h1>
             <form className="d-flex flex-column gap-2" action="" method="post">
                 <div className="input-group">
                     <label className="col-form-label me-1" htmlFor="name">Nombre:</label>
@@ -86,10 +87,9 @@ function ChangeData(){
 
 function EditSection(){
     return(
-        <div className="d-flex justify-content-center align-items-center py-5">            
-            <div className="row bg-secondary rounded">
-                <h1>Mi Perfil</h1>
-                <hr/>
+        <div className="text-light">            
+            <SectionHeader title={'Mi Perfil'} iconClass={'person-circle'}/>
+            <div className="row d-flex align-items-center py-5">
                 <ChangePic/>
                 <ChangeData/>
             </div>

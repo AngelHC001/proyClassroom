@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 
 import Post from "../components/post-template";
+import SectionHeader from "../components/section-header";
 
 //PUBLICA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
@@ -10,7 +11,6 @@ function PostContainer({ mode }){
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
-    //const [label, setLabel] = useState('Actividad')
 
     const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
 
@@ -43,16 +43,15 @@ function PostContainer({ mode }){
     },[mode, user]);
 
     return(
-        <div className="pivot">
-            <div className="row border-bottom sticky-top">
-                <h2 className="display-6 text-light">{label}</h2>
-            </div>
+        <div className="text-light">
+            <SectionHeader title={label} iconClass={'journal-check'}/>
 
             <div className="post-space d-flex flex-column gap-2 p-2">
                 {
                     loading ? <h1>CARGANDO</h1> :
                         data.map((p) => (<Post key={p?.idPost} PostData={p}/>)) 
-                }         
+                } 
+                <br/>        
             </div>
         </div>
     )

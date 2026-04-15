@@ -1,13 +1,16 @@
 /*LOGIN-REGISTER SECTIONS*/
 html, body {
     height: 100%;
-   
+    margin: 0;
+    overflow: hidden;
 }
 
 #root {
-    height: 100vh;
+    height: 100%;
+    overflow: hidden;
     /* o height: 100vh; overflow-y*/    
 }
+
 
 .bg1 {
     background-image: url("../src/assets/students.jpg");
@@ -32,8 +35,22 @@ input[type="file"] {
 }
 
 .post-space{
-    height: calc(80vh - 60px); /* menos el header */
+    height: calc(80dvh - 58px); /* menos el header */
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Habilita el scroll fluido en iOS */
+    overscroll-behavior-y: contain;     /* Evita que el scroll "arrastre" toda la página (el efecto rebote) */
+}
+
+@media (max-width: 768px) {
+  html, body {
+    overflow: auto;
+    height: auto;
+  }
+  
+  .contenedor-actividad {
+    height: auto;
+    overflow-y: visible;
+  }
 }
 
 

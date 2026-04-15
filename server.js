@@ -172,8 +172,8 @@ app.post('/api/fetch_posts', async(req,res) => {
             query += ' WHERE IDUSUARIO = @idUsuario';   
         }
         else if(mode === 'user_posts'){
-            request.input('nombre', sql.NVarChar, userData.nombre);
-            query += ' WHERE NOMBRE != @nombre AND TIPOUSUARIO = 1';
+            request.input('remitente', sql.NVarChar, `${userData.matricula}-${userData.nombre}`);
+            query += ' WHERE REMITENTE != @remitente';
         }
 
         //DEFAULT GENERAL
