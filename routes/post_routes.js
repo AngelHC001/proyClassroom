@@ -1,8 +1,8 @@
 import express from 'express';
+
 import sql from 'mssql';
 import { pool } from './db_connection.js';
 const router = express.Router();
-
 
 //PUBLICAR INSERT Y DELETE
 router.post('/upload_post', async(req,res) => {

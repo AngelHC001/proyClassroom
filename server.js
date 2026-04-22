@@ -1,6 +1,4 @@
 //INITIALIZATE
-import fs from 'node:fs'        //filesystem
-import multer from 'multer' 
 import express from 'express'   //app
 import cors from 'cors'
 
@@ -9,27 +7,12 @@ import sql from 'mssql'
 import { pool } from './routes/db_connection.js'
 
 import postRoutes from './routes/post_routes.js'
-
+import profileRoutes from './routes/profile_routes.js'
 
 
 //APP SERVER INIT
 const PORT = 3000;
 const app = express();
-
-
-//MULTER FILE UPLOAD CONFIG 
-const storage = multer.diskStorage({
-    destination: (req,file,cb) => {
-        cb(null,'appUserData/');
-    },
-    filename: (req,file,cb) => {
-        const uniqName = Date.now() + "-" + file.originalname;
-        cb(null,uniqName);
-    }
-});
-
-const upload = multer({storage});
-
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -109,84 +92,8 @@ app.post('/api/login', async(req,res)=>{
 });
 
 
-
-
-//EDITAR PERFIL (UPLOAD SINGLE MUEVE ARCHIVO)
-app.put('/api/change_picture', upload.single('newImg'), async(req,res) => {
-    const userOnline = JSON.parse(req.body.userOnline);
-    const newImg = req.file;
-
-    if(!userOnline || !newImg){
-        return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
-    }
-
-    if(!fs.existsSync('appUserData')){
-        return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
-    }
-
-    try {
-        //REGISTRAR NUEVO NOMBRE
-        await pool.request()
-            .input('idUsuario',sql.Int ,userOnline.id)
-            .input('matricula',sql.NVarChar,userOnline.mat)
-            .input('nombreImg',sql.NVarChar,newImg.filename)
-            .query('UPDATE ALUMNO SET NOMBREIMG = @nombreImg WHERE IDUSUARIO = @idUsuario AND MATRICULA = @matricula;')
-
-        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: newImg.filename});  
-    } catch (error) {
-        console.error('Error al actualizar perfil', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
-    }
-});
-
-
-//ACTUALIZAR DATOS
-app.put('/api/rewrite_data', async(req,res) => {
-    const { newData, user } = req.body;
-
-    try {
-        const request = await pool.request();
-        request.input('idUsuario',sql.Int ,user.id)
-        const setClauses = [];
-        
-        //Cambio nombre?
-        if(newData.nombre !== user.nombre){
-            request.input('newName',sql.NVarChar,newData.nombre)
-            setClauses.push('NOMBRE = @newName');
-        }
-       
-        //Cambio matricula?
-        if(newData.matricula !== user.matricula){
-            request.input('newMat',sql.NVarChar,newData.matricula)
-            setClauses.push('MATRICULA = @newMat');
-        }
-      
-        //NuevaPass?
-        if(newData.npass1 !== ''){
-            const newHashed = await bcrypt.hash(newData.npass1,10);
-            request.input('contrasena',sql.NVarChar,newHashed)
-            setClauses.push('CONTRASENA = @contrasena');  
-        }
-
-        //SIN CAMBIOS
-        if(setClauses.length === 0){
-            return res.status(400).json({message: 'Sin cambios ingresados'});
-        }
-
-        const query = `UPDATE ALUMNO SET ${setClauses.join(', ')} WHERE IDUSUARIO = @idUsuario`
-        await request.query(query);
-        return res.status(200).json({message: 'Datos Actualizados'});  
-    } catch (error) {
-        console.error('Error al actualizar perfil', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
-    }
-});
-
-
 app.use('/api/posts',postRoutes);
-
-//app.use()
-
+app.use('/api/profile',profileRoutes);
 
 
 app.listen(PORT,() => {
