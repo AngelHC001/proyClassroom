@@ -1,11 +1,15 @@
 //INITIALIZATE
 import fs from 'node:fs'        //filesystem
 import multer from 'multer' 
-
 import express from 'express'   //app
-import sql from 'mssql'
 import cors from 'cors'
+
 import bcrypt from 'bcrypt'
+import sql from 'mssql'
+import { pool } from './routes/db_connection.js'
+
+import postRoutes from './routes/post_routes.js'
+
 
 
 //APP SERVER INIT
@@ -29,30 +33,6 @@ const upload = multer({storage});
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-//SQL SERVER CONFIG
-const config = {
-    server: "localhost",
-    user: 'ClassroomTester',
-    password: 'classroom$2026',
-    database: 'ProyClassroom',
-    port: 1433,
-    options:{
-        encrypt: false,                 // Set to true if using Azure or SSL
-        trustServerCertificate: true    // For local development
-    }    
-};
-
-let pool;
-async function startConnection() {
-    try {
-        pool = await sql.connect(config);
-        console.log('✅ SQL SERVER Connection successful!');
-    } catch (err) {
-        console.error('❌ Connection failed! ', err.message);
-    }
-}
-startConnection();
 
 
 //REGISTER
@@ -128,99 +108,6 @@ app.post('/api/login', async(req,res)=>{
     }
 });
 
-//PUBLICAR INSERT Y DELETE
-app.post('/api/upload_post', async(req,res) => {
-    //recibe datos
-    const {remitent ,title, content, files} = req.body;
-    const date = new Date();
-
-    //Validacion debe haber al menos uno ocupado
-    if(!title && !content && files){
-        return res.status(400).json({ message: 'Todos los campos estan vacios' });
-    }
-
-    try {
-        //mover archivos si hay
-            //CODIGO MOVER A CARPETA (DELEGADO)
-
-        //Preparar consulta (FORMATEAR FECHA DESPUES)
-        let fecha = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-        let hora = `${date.getHours()}:${date.getMinutes()}`;
-        let datosRemitente = `${remitent.matricula}-${remitent.nombre}`
-        let idRemitente = remitent.id;
-
-        await pool.request()
-            .input('titulo',sql.NVarChar,title)
-            .input('contenido', sql.NVarChar,content)
-            .input('fechahora',sql.DateTime,`${fecha} ${hora}`)
-            .input('stringfiles',sql.NVarChar,files)
-            .input('remitente',sql.NVarChar,datosRemitente)
-            .input('idUsuario',sql.Int,idRemitente)
-            .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
-                ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
-        
-        //Dar positivo
-        res.status(200).json({message: 'Se publicó tu post'})        
-    } catch (error) {
-        console.error('Error en el insert:', error);
-        res.status(500).json({message: 'Error interno del servidor'});     
-    }
-});
-
-//VER PUBLICACIONES (TODAS, MIAS, ADMIN)
-app.post('/api/fetch_posts', async(req,res) => {
-    const { mode, userData } = req.body;
-
-    if(!mode || !userData){
-        return res.status(400).json({ message: 'Sin requisitos de consulta' });
-    }
-    
-    try {
-        const request = await pool.request();
-        let query = "SELECT * FROM POST";
-
-        //MODO MIS POSTS
-        if(mode === 'my_posts'){
-            request.input('idUsuario', sql.Int, userData.id);
-            query += ' WHERE IDUSUARIO = @idUsuario';   
-        }
-        else if(mode === 'user_posts'){
-            request.input('remitente', sql.NVarChar, `${userData.matricula}-${userData.nombre}`);
-            query += ' WHERE REMITENTE != @remitente';
-        }
-
-        //DEFAULT GENERAL
-        const result = await request.query(query);
-        return res.status(200).json(result.recordset);
-      
-    } catch (error) {
-        console.error('Algo salio mal al cargar', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
-    }
-});
-
-//ELIMINAR POSTS (MIAS Y ADMIN)
-app.delete('/api/erase_post',async(req,res) => {
-    const {mode, postTarget } = req.body;
-
-    if(!mode || !postTarget){
-        return res.status(400).json({ message: 'Sin requisitos de consulta' });
-    }
-
-    try {
-        const request = await pool.request();
-        //MODO MIS POSTS
-        if(mode === 'my_posts' || mode === 'user_posts'){
-            request.input('idPost', sql.Int, postTarget.idPost)
-            await request.query('DELETE FROM POST WHERE IDPOST = @idPost');
-        }
-       
-        return res.status(200).json({message: 'Post Eliminado'});
-    } catch (error) {
-        console.error('Error al borrar el Post', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
-    }
-});
 
 
 
@@ -296,10 +183,11 @@ app.put('/api/rewrite_data', async(req,res) => {
 });
 
 
+app.use('/api/posts',postRoutes);
 
-app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-});
+//app.use()
+
+
 
 app.listen(PORT,() => {
     console.log('SERVER ACTIVATED!');

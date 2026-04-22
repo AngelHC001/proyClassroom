@@ -78,7 +78,7 @@ export function PostArea(){
         e.preventDefault();
         //HACER REQUEST
         try {
-            const response = await fetch('http://localhost:3000/api/upload_post',{
+            const response = await fetch('http://localhost:3000/api/posts/upload_post',{
                 method:'POST',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify(postData)

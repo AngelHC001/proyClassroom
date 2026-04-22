@@ -21,7 +21,7 @@ function PostContainer({ mode }){
 
         const GetPosts = async() => { 
             try{
-                const response = await fetch('http://localhost:3000/api/fetch_posts',{
+                const response = await fetch('http://localhost:3000/api/posts/fetch_posts',{
                     method:'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ mode: mode, userData: user}),

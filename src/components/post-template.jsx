@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+/*
 function FileContainer({filename}){
     return(
         <a href="#" download="#" >
             <img className="rounded" src="../assets/teacher1.jpg" width="80" height="80"/>
         </a>
     )
-}
+}*/
 
 
 function Post({PostData, context ,isManageEnabled = false}){
@@ -21,7 +22,7 @@ function Post({PostData, context ,isManageEnabled = false}){
     const handleDelete = async (e) => {
         e.preventDefault();
         try{
-            const response = await fetch('http://localhost:3000/api/erase_post',{
+            const response = await fetch('http://localhost:3000/api/posts/erase_post',{
                 method:'DELETE',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ mode:context, postTarget: PostData}),
