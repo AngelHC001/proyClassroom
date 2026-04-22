@@ -32,13 +32,17 @@ function NewUser(){
     )
 }
 
+
 function AdminControl(){
+    
+
+
+
     return(
         <div className="d-flex flex-column gap-2 text-light">
             <SectionHeader title={"Control de Usuarios"} iconClass={'people-fill'}/>
-
             <NewUser/>
-        
+
             <table className="table table-bordered mt-1 text-center">
                 <tbody>
                     <TableHeaders/>

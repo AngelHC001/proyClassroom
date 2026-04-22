@@ -1,19 +1,34 @@
 //INITIALIZATE
-//import fs from 'node:fs'        //filesystem
-//import path from 'node:path'    //path
+import fs from 'node:fs'        //filesystem
+import multer from 'multer' 
+
 import express from 'express'   //app
 import sql from 'mssql'
 import cors from 'cors'
 import bcrypt from 'bcrypt'
 
+
 //APP SERVER INIT
 const PORT = 3000;
 const app = express();
 
+
+//MULTER FILE UPLOAD CONFIG 
+const storage = multer.diskStorage({
+    destination: (req,file,cb) => {
+        cb(null,'appUserData/');
+    },
+    filename: (req,file,cb) => {
+        const uniqName = Date.now() + "-" + file.originalname;
+        cb(null,uniqName);
+    }
+});
+
+const upload = multer({storage});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 //SQL SERVER CONFIG
 const config = {
@@ -73,7 +88,7 @@ app.post('/api/register', async(req,res) => {
 
 //LOGIN
 app.post('/api/login', async(req,res)=>{
-     const { mat, pass } = req.body;
+    const { mat, pass } = req.body;
     
     //Validación
     if (!mat || !pass) {
@@ -145,7 +160,7 @@ app.post('/api/upload_post', async(req,res) => {
                 ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
         
         //Dar positivo
-        res.status(201).json({message: 'Se publicó tu post'})        
+        res.status(200).json({message: 'Se publicó tu post'})        
     } catch (error) {
         console.error('Error en el insert:', error);
         res.status(500).json({message: 'Error interno del servidor'});     
@@ -194,20 +209,12 @@ app.delete('/api/erase_post',async(req,res) => {
 
     try {
         const request = await pool.request();
-        let query = "DELETE FROM POST WHERE ";
-
         //MODO MIS POSTS
-        if(mode === 'my_posts'){
+        if(mode === 'my_posts' || mode === 'user_posts'){
             request.input('idPost', sql.Int, postTarget.idPost)
-            query += 'IDPOST = @idPost';   
-            await request.query(query);
+            await request.query('DELETE FROM POST WHERE IDPOST = @idPost');
         }
-        else if(mode === 'user_posts'){
-            request.input('idPost', sql.Int, postTarget.idPost)
-            query += 'IDPOST = @idPost AND TIPOUSUARIO = 1';
-            await request.query(query);
-        }
-
+       
         return res.status(200).json({message: 'Post Eliminado'});
     } catch (error) {
         console.error('Error al borrar el Post', error);
@@ -217,10 +224,78 @@ app.delete('/api/erase_post',async(req,res) => {
 
 
 
+//EDITAR PERFIL (UPLOAD SINGLE MUEVE ARCHIVO)
+app.put('/api/change_picture', upload.single('newImg'), async(req,res) => {
+    const userOnline = JSON.parse(req.body.userOnline);
+    const newImg = req.file;
+
+    if(!userOnline || !newImg){
+        return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
+    }
+
+    if(!fs.existsSync('appUserData')){
+        return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
+    }
+
+    try {
+        //REGISTRAR NUEVO NOMBRE
+        await pool.request()
+            .input('idUsuario',sql.Int ,userOnline.id)
+            .input('matricula',sql.NVarChar,userOnline.mat)
+            .input('nombreImg',sql.NVarChar,newImg.filename)
+            .query('UPDATE ALUMNO SET NOMBREIMG = @nombreImg WHERE IDUSUARIO = @idUsuario AND MATRICULA = @matricula;')
+
+        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: newImg.filename});  
+    } catch (error) {
+        console.error('Error al actualizar perfil', error);
+        res.status(500).json({message: 'Error interno del servidor'}); 
+    }
+});
 
 
+//ACTUALIZAR DATOS
+app.put('/api/rewrite_data', async(req,res) => {
+    const { newData, user } = req.body;
 
-//app.put
+    try {
+        const request = await pool.request();
+        request.input('idUsuario',sql.Int ,user.id)
+        const setClauses = [];
+        
+        //Cambio nombre?
+        if(newData.nombre !== user.nombre){
+            request.input('newName',sql.NVarChar,newData.nombre)
+            setClauses.push('NOMBRE = @newName');
+        }
+       
+        //Cambio matricula?
+        if(newData.matricula !== user.matricula){
+            request.input('newMat',sql.NVarChar,newData.matricula)
+            setClauses.push('MATRICULA = @newMat');
+        }
+      
+        //NuevaPass?
+        if(newData.npass1 !== ''){
+            const newHashed = await bcrypt.hash(newData.npass1,10);
+            request.input('contrasena',sql.NVarChar,newHashed)
+            setClauses.push('CONTRASENA = @contrasena');  
+        }
+
+        //SIN CAMBIOS
+        if(setClauses.length === 0){
+            return res.status(400).json({message: 'Sin cambios ingresados'});
+        }
+
+        const query = `UPDATE ALUMNO SET ${setClauses.join(', ')} WHERE IDUSUARIO = @idUsuario`
+        await request.query(query);
+        return res.status(200).json({message: 'Datos Actualizados'});  
+    } catch (error) {
+        console.error('Error al actualizar perfil', error);
+        res.status(500).json({message: 'Error interno del servidor'}); 
+    }
+});
+
+
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });

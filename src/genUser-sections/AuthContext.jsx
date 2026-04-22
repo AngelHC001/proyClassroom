@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-
 const AuthContext = createContext(null); 
 
 export const AuthProvider = ({children}) => {
@@ -15,13 +14,19 @@ export const AuthProvider = ({children}) => {
         setUser(userData);
     }
 
+    const updateUser = (newData) => {
+        const updated = { ...user, ...newData };
+        localStorage.setItem("alumno", JSON.stringify(updated));
+        setUser(updated);
+    };
+
     const logout = () => {
         localStorage.removeItem("alumno");
         setUser(null);
     };
 
     return(
-        <AuthContext.Provider value={{user, login, logout}}>
+        <AuthContext.Provider value={{user, login, logout, updateUser}}>
             {children}
         </AuthContext.Provider>
     )

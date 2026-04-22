@@ -27,12 +27,14 @@ function PostContainer({ mode }){
                     body: JSON.stringify({ mode: mode, userData: user}),
                     signal: controller.signal
                 });
-
                 const results = await response.json();
                 setData(results);   
                 
             } catch (error) {
+                //ver si atrapa mensaje o lista vacia
+
                 if (error.name === 'AbortError') return;
+                
                 alert(error);               
             }
             finally{

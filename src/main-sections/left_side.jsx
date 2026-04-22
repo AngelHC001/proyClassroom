@@ -21,7 +21,7 @@ export function ProfileArea({activeView, setActiveView}){
         <div className="row text-center p-2">   
             <div className="col border-dark border-end">
                 <h3>{user?.nombre}</h3>
-                <img className="rounded" src={IMGPATH + user?.imgPerfil} width="80" height="80" alt="userProfile"/>
+                <img className="img-fluid rounded" src={IMGPATH + user?.imgPerfil} width="80" height="80" alt="userProfile"/>
                 <p>{user?.matricula}</p>
             </div>
 
