@@ -8,7 +8,7 @@ import { pool } from './routes/db_connection.js'
 
 import postRoutes from './routes/post_routes.js'
 import profileRoutes from './routes/profile_routes.js'
-
+import teacherRoutes from './routes/teacher_routes.js'
 
 //APP SERVER INIT
 const PORT = 3000;
@@ -94,6 +94,7 @@ app.post('/api/login', async(req,res)=>{
 
 app.use('/api/posts',postRoutes);
 app.use('/api/profile',profileRoutes);
+app.use('/api/teacher',teacherRoutes);
 
 
 app.listen(PORT,() => {

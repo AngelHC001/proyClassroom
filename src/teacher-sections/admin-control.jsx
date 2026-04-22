@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SectionHeader from "../components/section-header";
-
+import { useAuth } from "../genUser-sections/AuthContext.jsx"
 
 function TableHeaders(){
     return(
@@ -10,6 +10,21 @@ function TableHeaders(){
             <th>Tipo Usuario</th>
             <th>Opciones</th>
         </tr>    
+    )
+}
+
+function UserDataContainer({name, mat, user_type}){
+    return(
+        <tr>
+            <td>{name}</td>
+            <td>{mat}</td>
+            <td>{user_type === 0 ? 'Alumno' : 'Administrador'}</td>
+            <td>
+                <button className="btn btn-sm btn-danger" value="<?php echo $row[0]; ?>" title="Borrar">
+                    <i className="bi bi-dash-circle-fill"></i>
+                </button>
+            </td>
+        </tr>
     )
 }
 
@@ -34,34 +49,70 @@ function NewUser(){
 
 
 function AdminControl(){
+    const { user } = useAuth();
+    const [users, setUsers] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     
+    useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
 
+        async function fetchUsers(){
+            setLoading(true);
+            setError(null);
+            try{
+                const response = await fetch('http://localhost:3000/api/teacher/list_users',{
+                    method: 'GET',
+                    headers:{'Accept': 'application/json'},
+                    signal: signal
+                });
 
+                if(!response.ok){
+                    const errs = await response.json(); 
+                    throw new Error(errs.message);
+                }
+
+                const data = await response.json();
+                setUsers(data);
+            }
+            catch(err){
+                if (err.name !== "AbortError") { setError(err.message); }
+                console.error('ALGO SALIO MAL', err.message)
+            }
+            finally{
+                setLoading(false);
+            }
+        }
+        
+        fetchUsers();
+        return () => {controller.abort();}
+    },[]);
 
     return(
         <div className="d-flex flex-column gap-2 text-light">
             <SectionHeader title={"Control de Usuarios"} iconClass={'people-fill'}/>
             <NewUser/>
 
-            <table className="table table-bordered mt-1 text-center">
-                <tbody>
-                    <TableHeaders/>
-                    <tr>
-                        <td> echo $row[1]; </td>
-                        <td> echo $row[2]; </td>
-                        <td> echo $row[3]; </td>
-                        <td>
-                            <div className="form-check form-switch">
-                                <input className="form-check-input" name="tipo" type="checkbox"/>
-                                
-                                <button className="btn btn-sm btn-danger" value="<?php echo $row[0]; ?>" title="Borrar">
-                                    <i className="bi bi-dash-circle-fill"></i>
-                                </button>
-                            </div> 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>    
+            <div className="post-space">
+                 <table className="table table-bordered mt-1 text-center">
+                    { 
+                        error ? <thead>Ocurrio un error...</thead> :
+                        <tbody>
+                            <TableHeaders/>
+                            {
+                                loading ? <tr><td>CARGANDO</td></tr>:
+                                users.map((u) => ( u.IDUSUARIO === user?.id ? '':
+                                    <UserDataContainer key={u.IDUSUARIO} name={u.NOMBRE} 
+                                    mat={u.MATRICULA} user_type={u.TIPOUSUARIO}/>))
+                            }
+                        </tbody>
+                    }
+                </table>
+                <br/>
+                <br/>
+                <br/>    
+            </div>
         </div>
     )
 }
