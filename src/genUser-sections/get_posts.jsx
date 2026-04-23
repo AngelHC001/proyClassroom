@@ -4,12 +4,15 @@ import { useAuth } from "./AuthContext";
 
 import Post from "../components/post-template";
 import SectionHeader from "../components/section-header";
+import LoadingSpinner from "../components/loading_spinner";
+import DisplayError from "../components/error_banner";
 
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
 function PostContainer({ mode }){
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [data, setData] = useState([]);
     const scrollRef = useRef(null);
 
@@ -18,6 +21,8 @@ function PostContainer({ mode }){
 
     useEffect(()=>{    
         const controller = new AbortController();
+        setLoading(true);
+        setError(null);
 
         const GetPosts = async() => { 
             try{
@@ -32,10 +37,9 @@ function PostContainer({ mode }){
                 
             } catch (error) {
                 //ver si atrapa mensaje o lista vacia
-
                 if (error.name === 'AbortError') return;
-                
-                alert(error);               
+                setError(error);
+                console.error(error.message);         
             }
             finally{
                 setLoading(false);
@@ -53,10 +57,12 @@ function PostContainer({ mode }){
         <div className="text-light" ref={scrollRef}>
             <SectionHeader title={label} iconClass={'journal-check'}/>
             <div className="post-space d-flex flex-column gap-2 p-2">
-                {   loading ? <h1>CARGANDO</h1> :
-                        data.map((p) => (
-                            <Post key={p?.idPost} PostData={p} context={mode} isManageEnabled={manageMode}/>
-                        )) 
+                {
+                    error ? <DisplayError/> 
+                    : 
+                    loading ? <LoadingSpinner/> :
+                        data.map((p) => (<Post key={p?.idPost} PostData={p} context={mode} 
+                            isManageEnabled={manageMode}/>)) 
                 } 
                 <br/>        
             </div>

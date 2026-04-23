@@ -6,7 +6,7 @@ function FileContainer(){
         <div className="col">
             <div className="card left-side border-0">
                 <div className="card-header">
-                    <img className="card-img-top" src=""/>            
+                    <img className="card-img-top"/>            
                 </div>
  
                 <ul className="list-group list-group-flush">
@@ -15,7 +15,7 @@ function FileContainer(){
                 </ul>
                           
                 <form className="card-footer text-center">
-                    <a className="btn btn-primary me-2" href="" download="" >
+                    <a className="btn btn-primary me-2">
                         Descargar
                     </a>
                             

@@ -1,5 +1,5 @@
 //INITIALIZATE
-import express from 'express'   //app
+import express from 'express'
 import cors from 'cors'
 
 import bcrypt from 'bcrypt'
@@ -95,7 +95,6 @@ app.post('/api/login', async(req,res)=>{
 app.use('/api/posts',postRoutes);
 app.use('/api/profile',profileRoutes);
 app.use('/api/teacher',teacherRoutes);
-
 
 app.listen(PORT,() => {
     console.log('SERVER ACTIVATED!');
