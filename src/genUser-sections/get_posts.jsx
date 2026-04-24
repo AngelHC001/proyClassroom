@@ -7,9 +7,10 @@ import SectionHeader from "../components/section-header";
 import LoadingSpinner from "../components/loading_spinner";
 import DisplayError from "../components/error_banner";
 
+
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
-function PostContainer({ mode, refreshKey }){
+function PostContainer({ mode, refreshKey, onRefresh }){
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,12 +20,33 @@ function PostContainer({ mode, refreshKey }){
     const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
     const manageMode = (mode === 'my_posts') || mode === ('user_posts') ? true : false;
 
+    //HANDLE onDelete
+    const handleDelete = async(e, postId) => {
+        e.preventDefault();
+        if(!confirm('¿Borrar Publicacion?')){ return; }
+
+        try{
+            await fetch(`http://localhost:3000/api/posts/erase_post/${postId}`, { method:'DELETE' });
+            onRefresh();
+        } catch (error) {
+            console.error(error.message);
+            alert('OCURRIO UN ERROR AL BORRAR');               
+        }
+    }
+
+
+
+
+
+
+
+
+
     useEffect(()=>{    
         const controller = new AbortController();
         setLoading(true);
         setError(null);
         
-
         const GetPosts = async() => { 
             try{
                 const response = await fetch('http://localhost:3000/api/posts/fetch_posts',{
@@ -62,9 +84,10 @@ function PostContainer({ mode, refreshKey }){
                 {
                     error ? <DisplayError/> 
                     : 
-                    loading ? <LoadingSpinner/> :
-                        data.map((p) => (<Post key={p?.idPost} PostData={p} context={mode} 
-                            isManageEnabled={manageMode}/>)) 
+                    loading ? <LoadingSpinner/> 
+                        :
+                        data.map((p) => (<Post key={p?.idPost} PostData={p} isManageEnabled={manageMode} 
+                            onDelete={handleDelete}/>)) 
                 } 
                 <div ref={bottomRef} ></div>
                 <br/>        

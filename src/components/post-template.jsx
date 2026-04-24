@@ -1,5 +1,4 @@
 import React from "react";
-//import { useNavigate } from "react-router-dom";
 
 /*
 function FileContainer({filename}){
@@ -11,35 +10,10 @@ function FileContainer({filename}){
 }*/
 
 
-function Post({PostData, context, isManageEnabled = false}){
-    //const navigate = useNavigate();
-    //HANDLE LIKES
-    //HANDLE COMMENT
-    
-    const handleDelete = async (e) => {
-        e.preventDefault();
-        try{
-            const response = await fetch('http://localhost:3000/api/posts/erase_post',{
-                method:'DELETE',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ mode:context, postTarget: PostData}),
-            });
+function Post({PostData, isManageEnabled = false, onLike, onComment, onDelete}){
+   
+    //const fileChain = PostData?.stringfile !== '' ? PostData?.stringfile.split('-'): [];
 
-            if(!response.ok){
-                const data = await response.json();
-                throw new Error(data.message); 
-            }
-
-        } catch (error) {
-            console.error(error.message);
-            alert(error);               
-        }
-    }
-
-    
-    //const filePreviews = [];
-    //const fileChain = PostData?.stringfile !== '' ? PostData?.stringfile.split('-'): '';
-    
     //fileChain.map((f) => filePreviews.push(
       //  <FileContainer key={`postfile${f.lenght}`} filename={f}/>
     //))
@@ -60,20 +34,20 @@ function Post({PostData, context, isManageEnabled = false}){
                 </div>
             </div>
 
-            <form className="card-footer border-light d-flex gap-2">
-                <button className="btn btn-success border-0 btn-sm">
-                     <i className="bi bi-check-circle"></i> {PostData?.likes}   
+            <form className="card-footer border-top-light d-flex gap-2">
+                <button className="btn btn-outline-light border-0 btn-sm">
+                     <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
 
-                <button className="btn btn-outline-light btn-admin border-0 btn-sm">
-                     <i className="bi bi-chat"></i> {PostData?.comentarios}      
+                <button className="btn btn-outline-light border-0 btn-sm">
+                     <i className="bi bi-chat fs-4"/> {PostData?.comentarios}      
                 </button>
 
                 {isManageEnabled ?  
-                    <button className="btn btn-danger border-0 btn-sm" type="submit" onClick={handleDelete}>
-                         <i className="bi bi-dash-circle-fill"></i>      
-                    </button> :
-                    ''
+                    <button className="btn btn-outline-light border-0 btn-sm"
+                        onClick={(e) => onDelete(e, PostData?.idPost)}>
+                         <i className="bi bi-dash-circle text-danger fs-4"/>      
+                    </button> : ''
                 }
             </form>
         </div>

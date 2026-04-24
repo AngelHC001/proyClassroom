@@ -83,9 +83,9 @@ function AdminRightSide({activeView = ''}){
             {activeView === 'users_control' &&  <AdminControl/>}
             {activeView === 'my_profile' && <EditSection/>}
             {activeView === 'my_posts' &&  <PostContainer mode={'my_posts'} 
-                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k+1)}/>}
+                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)}/>}
             {activeView === 'manage_posts' &&  <PostContainer mode={'user_posts'} 
-                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k+1)}/>}
+                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)}/>}
             {activeView === 'manage_files' &&  <AdminFiles/>} 
         </div>
     )

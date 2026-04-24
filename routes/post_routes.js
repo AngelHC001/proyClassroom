@@ -76,22 +76,20 @@ router.post('/fetch_posts', async(req,res) => {
     }
 });
 
-//ELIMINAR POSTS (MIAS Y ADMIN)
-router.delete('/erase_post',async(req,res) => {
-    const {mode, postTarget } = req.body;
 
-    if(!mode || !postTarget){
+//ELIMINAR POSTS (MIAS Y ADMIN)
+router.delete('/erase_post/:id',async(req,res) => {
+    const postTarget = req.params.id;
+
+    if(!postTarget){
         return res.status(400).json({ message: 'Sin requisitos de consulta' });
     }
 
     try {
-        const request = await pool.request();
-        //MODO MIS POSTS
-        if(mode === 'my_posts' || mode === 'user_posts'){
-            request.input('idPost', sql.Int, postTarget.idPost)
-            await request.query('DELETE FROM POST WHERE IDPOST = @idPost');
-        }
-       
+        await pool.request()
+            .input('idPost', sql.Int, postTarget)
+            .query('DELETE FROM POST WHERE IDPOST = @idPost');
+
         return res.status(200).json({message: 'Post Eliminado'});
     } catch (error) {
         console.error('Error al borrar el Post', error);
