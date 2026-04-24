@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 /*
 function FileContainer({filename}){
@@ -11,13 +11,10 @@ function FileContainer({filename}){
 }*/
 
 
-function Post({PostData, context ,isManageEnabled = false}){
-    const navigate = useNavigate();
-
+function Post({PostData, context, isManageEnabled = false}){
+    //const navigate = useNavigate();
     //HANDLE LIKES
-
     //HANDLE COMMENT
-
     
     const handleDelete = async (e) => {
         e.preventDefault();
@@ -33,7 +30,6 @@ function Post({PostData, context ,isManageEnabled = false}){
                 throw new Error(data.message); 
             }
 
-            navigate(0);
         } catch (error) {
             console.error(error.message);
             alert(error);               

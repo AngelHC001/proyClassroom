@@ -55,9 +55,8 @@ export function ProfileArea({activeView, setActiveView}){
 
 
 
-export function PostArea(){
+export function PostArea({onPost}){
     const { user } = useAuth();
-    const navigate = useNavigate();
 
     const [postData,setpostData] = useState({remitent: user, title:'',content:'',files:''});
     const [message, setMessage] = useState({color:'secondary', text:''});
@@ -93,8 +92,8 @@ export function PostArea(){
             const result = await response.json(); 
             setMessage({color: 'success', text: result.message});
             clearFields();
-            navigate(0);
-        
+            
+            onPost();
         } catch (error) {
             console.error('Error al registrar:', error.message);
             setMessage({color: 'danger', text: 'Error Algo salió mal'});

@@ -1,5 +1,5 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 
 import Post from "../components/post-template";
@@ -9,13 +9,13 @@ import DisplayError from "../components/error_banner";
 
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
-function PostContainer({ mode }){
+function PostContainer({ mode, refreshKey }){
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState([]);
-    const scrollRef = useRef(null);
-
+    const bottomRef = useRef(null);
+    
     const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
     const manageMode = (mode === 'my_posts') || mode === ('user_posts') ? true : false;
 
@@ -23,6 +23,7 @@ function PostContainer({ mode }){
         const controller = new AbortController();
         setLoading(true);
         setError(null);
+        
 
         const GetPosts = async() => { 
             try{
@@ -46,15 +47,16 @@ function PostContainer({ mode }){
             }
         }
 
-        if (scrollRef.current) {
-            scrollRef.current.scrollBottom = scrollRef.current.scrollHeight;
-        }
         GetPosts();
-        return () => controller.abort(); 
-    },[mode, user]);
+        return () => controller.abort();
+    },[mode, user, refreshKey]);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [data]);
 
     return(
-        <div className="text-light" ref={scrollRef}>
+        <div className="text-light">
             <SectionHeader title={label} iconClass={'journal-check'}/>
             <div className="post-space d-flex flex-column gap-2 p-2">
                 {
@@ -64,6 +66,7 @@ function PostContainer({ mode }){
                         data.map((p) => (<Post key={p?.idPost} PostData={p} context={mode} 
                             isManageEnabled={manageMode}/>)) 
                 } 
+                <div ref={bottomRef} ></div>
                 <br/>        
             </div>
         </div>

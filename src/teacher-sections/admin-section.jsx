@@ -41,9 +41,6 @@ const db_items = [
 ];
 
 
-//use auth  para verificar el tipo ususario 1
-
-
 function AdminLeftBar({setActiveView}){
     return(
         <div className="col-md-4 left-side text-center p-3">
@@ -79,12 +76,16 @@ function AdminLeftBar({setActiveView}){
 }
 
 function AdminRightSide({activeView = ''}){
+    const [refreshKey,setRefreshKey] = useState(0);
+
     return(
         <div className="col-md-8 right-side">
             {activeView === 'users_control' &&  <AdminControl/>}
             {activeView === 'my_profile' && <EditSection/>}
-            {activeView === 'my_posts' &&  <PostContainer mode={'my_posts'}/>}
-            {activeView === 'manage_posts' &&  <PostContainer mode={'user_posts'}/>}
+            {activeView === 'my_posts' &&  <PostContainer mode={'my_posts'} 
+                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k+1)}/>}
+            {activeView === 'manage_posts' &&  <PostContainer mode={'user_posts'} 
+                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k+1)}/>}
             {activeView === 'manage_files' &&  <AdminFiles/>} 
         </div>
     )
