@@ -22,7 +22,6 @@ function Post({PostData, isManageEnabled = false, onLike, onComment, onDelete}){
         <div className="card border-0 post text-light me-2">
             <div className="card-header border-light d-flex justify-content-between align-items-center">
                 <h3>{PostData?.titulo}</h3>
-
                 <small>{PostData?.remitente} {PostData?.fechahora}</small>
             </div>
 
@@ -35,7 +34,8 @@ function Post({PostData, isManageEnabled = false, onLike, onComment, onDelete}){
             </div>
 
             <form className="card-footer border-top-light d-flex gap-2">
-                <button className="btn btn-outline-light border-0 btn-sm">
+                <button className="btn btn-outline-light border-0 btn-sm"
+                    onClick={(e) => onLike(e,PostData?.idPost)}>
                      <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
 

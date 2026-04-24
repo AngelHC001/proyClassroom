@@ -52,8 +52,8 @@ router.post('/register_user',async(req,res) => {
 });
 
 
-router.delete('/erase_user',async(req,res) => {
-    const deletionId = req.body;
+router.delete('/erase_user/:id',async(req,res) => {
+    const deletionId = req.params.id;
     
     if(!deletionId){
         return res.status(400).json({message: 'Sin requisitos para borrar'})
@@ -61,7 +61,7 @@ router.delete('/erase_user',async(req,res) => {
     
     try{
         await pool.request()
-         .input('idUsuario',sql.Int, deletionId.userTarget)
+         .input('idUsuario',sql.Int, deletionId)
          .query('DELETE FROM ALUMNO WHERE IDUSUARIO = @idUsuario')
         
         return res.status(200).json({message: 'Usuario Eliminado'})
@@ -70,8 +70,7 @@ router.delete('/erase_user',async(req,res) => {
         console.error('Ocurrio un error de consulta (Admin):', err);
         res.status(500).json({message: 'Error interno del servidor'});
     }
-
-})
+});
 
 
 export default router;

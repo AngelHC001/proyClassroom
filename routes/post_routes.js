@@ -39,7 +39,7 @@ router.post('/upload_post', async(req,res) => {
         res.status(200).json({message: 'Se publicó tu post'})        
     } catch (error) {
         console.error('Error en el insert:', error);
-        res.status(500).json({message: 'Error interno del servidor'});     
+        res.status(500).json({message: 'Error interno del servidor (PUBLICAR)'});     
     }
 });
 
@@ -72,7 +72,25 @@ router.post('/fetch_posts', async(req,res) => {
       
     } catch (error) {
         console.error('Algo salio mal al cargar', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
+        res.status(500).json({message: 'Error interno del servidor (FETCH)'}); 
+    }
+});
+
+router.post('/like_post/:id', async(req,res) => {
+    const postTarget = req.params.id;
+
+    if(!postTarget){
+        return res.status(400).json({ message: 'No hay post' });
+    }
+
+    try {
+        await pool.request()
+            .input('targetPost', sql.Int, postTarget)    
+            .query('UPDATE POST SET LIKES = LIKES + 1 WHERE IDPOST = @targetPost');
+        return res.status(200).json({message: 'Like Post +1'});
+    } catch (error) {
+        console.error('Error al dar like', error);
+        res.status(500).json({message: 'Error interno del servidor (Like)'}); 
     }
 });
 
@@ -93,7 +111,7 @@ router.delete('/erase_post/:id',async(req,res) => {
         return res.status(200).json({message: 'Post Eliminado'});
     } catch (error) {
         console.error('Error al borrar el Post', error);
-        res.status(500).json({message: 'Error interno del servidor'}); 
+        res.status(500).json({message: 'Error interno del servidor (DeletePost)'}); 
     }
 });
 

@@ -20,6 +20,18 @@ function PostContainer({ mode, refreshKey, onRefresh }){
     const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
     const manageMode = (mode === 'my_posts') || mode === ('user_posts') ? true : false;
 
+     //HANDLE onLike
+    const handleLike = async(e, postId) => {
+        manageMode ? e.preventDefault() : null;
+       
+        try{
+            await fetch(`http://localhost:3000/api/posts/like_post/${postId}`, { method:'POST' });
+            onRefresh();
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     //HANDLE onDelete
     const handleDelete = async(e, postId) => {
         e.preventDefault();
@@ -33,14 +45,6 @@ function PostContainer({ mode, refreshKey, onRefresh }){
             alert('OCURRIO UN ERROR AL BORRAR');               
         }
     }
-
-
-
-
-
-
-
-
 
     useEffect(()=>{    
         const controller = new AbortController();
@@ -74,7 +78,7 @@ function PostContainer({ mode, refreshKey, onRefresh }){
     },[mode, user, refreshKey]);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        bottomRef.current?.scrollIntoView({ behavior: 'instant' });
     }, [data]);
 
     return(
@@ -86,8 +90,11 @@ function PostContainer({ mode, refreshKey, onRefresh }){
                     : 
                     loading ? <LoadingSpinner/> 
                         :
-                        data.map((p) => (<Post key={p?.idPost} PostData={p} isManageEnabled={manageMode} 
-                            onDelete={handleDelete}/>)) 
+                        data.map((p) => (<Post key={p?.idPost} PostData={p} 
+                            isManageEnabled={manageMode} 
+                            onLike={handleLike}
+                            onDelete={handleDelete}/>
+                        )) 
                 } 
                 <div ref={bottomRef} ></div>
                 <br/>        

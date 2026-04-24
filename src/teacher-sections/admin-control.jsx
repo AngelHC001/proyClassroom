@@ -17,53 +17,23 @@ function TableHeaders(){
     )
 }
 
-function UserDataContainer({userId, name, mat, user_type}){
-
-    const handleDelete = async(e) => {
-        e.preventDefault();
-        if(!confirm('¿Eliminar este alumno del grupo?')){
-            return;
-        }
-    
-        try {
-                const response = await fetch('http://localhost:3000/api/teacher/erase_user',{
-                method: 'DELETE',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({userTarget: userId})
-            });
-            
-            if(!response.ok){
-                const dataErr = await response.json();
-                throw new Error(dataErr.message);
-            }
-
-            //Positivos
-            alert('El Usuario ha sido eliminado');
-            window.location.reload();
-
-        } catch (error) {
-            console.error('ERROR admin handleDelete', error.message)
-            alert('Ocurrio un error al borrar');
-        }
-    }
-
+function UserDataContainer({userData, onDelete}){
     return(
         <tr>
-            <td>{name}</td>
-            <td>{mat}</td>
-            <td>{user_type === 0 ? 'Alumno' : 'Administrador'}</td>
+            <td>{userData?.NOMBRE}</td>
+            <td>{userData?.MATRICULA}</td>
+            <td>{userData?.TIPOUSUARIO === 0 ? 'Alumno' : 'Administrador'}</td>
             <td>
-                <form onSubmit={handleDelete}>
-                    <button className="btn btn-sm btn-danger" type="submit" title="Borrar">
-                        <i className="bi bi-dash-circle-fill"/>
-                    </button>
-                </form>
+                <button className="btn btn-sm btn-danger" type="submit" title="Borrar" 
+                 onClick={(e) => onDelete(e,userData?.IDUSUARIO)}>
+                    <i className="bi bi-dash-circle-fill"/>
+                </button>
             </td>
         </tr>
     )
 }
 
-function NewUser(){
+function NewUser({onRefresh}){
     const [newUser, setNewUser] = useState({nombre:'', mat:''})
     const [isAdmin, setIsAdmin] = useState(false);
 
@@ -100,6 +70,7 @@ function NewUser(){
             setNewUser({nombre:'', mat:''});
             const data = await response.json();
             alert(data.message);
+            onRefresh();
         }
         catch(error){
             console.error(error.message);
@@ -130,12 +101,27 @@ function NewUser(){
 }
 
 
-function AdminControl(){
+function AdminControl({refreshKey, onRefresh}){
     const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const handleDelete = async(e, userId) => {
+        e.preventDefault();
+        if(!confirm('¿Eliminar este alumno del grupo?')){
+            return;
+        }
     
+        try {
+            await fetch(`http://localhost:3000/api/teacher/erase_user/${userId}`, { method: 'DELETE' });
+            onRefresh();
+        } catch (error) {
+            console.error('ERROR admin handleDelete', error.message)
+            alert('Ocurrio un error al borrar');
+        }
+    }
+
     useEffect(() => {
         const controller = new AbortController();
         const signal = controller.signal;
@@ -170,12 +156,12 @@ function AdminControl(){
         
         fetchUsers();
         return () => {controller.abort();}
-    },[]);
+    },[refreshKey]);
 
     return(
         <div className="d-flex flex-column gap-2 text-light">
             <SectionHeader title={"Control de Usuarios"} iconClass={'people-fill'}/>
-            <NewUser/>
+            <NewUser onRefresh={onRefresh}/>
 
             <div className="post-space">
                 {
@@ -186,8 +172,8 @@ function AdminControl(){
                                 <TableHeaders/>
                                 {
                                     users.map((u) => (u.IDUSUARIO === user?.id ? '':
-                                        <UserDataContainer key={u.IDUSUARIO} userId={u.IDUSUARIO} name={u.NOMBRE} 
-                                        mat={u.MATRICULA} user_type={u.TIPOUSUARIO}/>))
+                                        <UserDataContainer key={u.IDUSUARIO} 
+                                        userData={u} onDelete={handleDelete}/>))
                                 }
                             </tbody>
                         </table>
