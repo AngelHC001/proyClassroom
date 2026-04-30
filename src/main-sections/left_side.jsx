@@ -53,13 +53,12 @@ export function ProfileArea({activeView, setActiveView}){
 }
 
 
-
-
 export function PostArea({onPost}){
     const { user } = useAuth();
-
-    const [postData,setpostData] = useState({remitent: user, title:'',content:'',files:''});
     const [message, setMessage] = useState({color:'secondary', text:''});
+    const [postData,setpostData] = useState({remitent: user, title:'',content:''});
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const MAX = 5;
     
     const handleChange = (e) => {
         const {name,value} = e.target;
@@ -69,18 +68,42 @@ export function PostArea({onPost}){
         }));
     }
 
+    const handleFiles = (e) => {
+        const filesPack = Array.from(e.target.files).filter(file =>
+        file.type.startsWith('image/'));
+            
+        setSelectedFiles(prev => {
+            // Evitar duplicados por nombre
+            const existing = new Set(prev.map(f => f.name));
+            const nuevos = filesPack.filter(f => !existing.has(f.name));
+        
+            // Acumular y respetar el límite MAX
+            return [...prev, ...nuevos].slice(0, MAX);
+        });
+    }
+
     const clearFields = () =>{
-        setpostData({remitent: user, title:'',content:'',files:''});
+        setpostData({remitent: user, title:'',content:''});
+        setSelectedFiles([]);
+        document.getElementById('input-file').value = '';
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('remitent', JSON.stringify(postData.remitent));
+        formData.append('title',postData.title);
+        formData.append('content', postData.content);
+       
+        selectedFiles.forEach((file) => {
+            formData.append('images', file);
+        });
+
         //HACER REQUEST
         try {
             const response = await fetch('http://localhost:3000/api/posts/upload_post',{
                 method:'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify(postData)
+                body: formData
             });
 
             if(!response.ok){
@@ -102,9 +125,11 @@ export function PostArea({onPost}){
 
     return(
         <div className="p-2">
-            <h4>Publicar</h4>
-            <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
-            
+            <div className="d-flex flex-row align-items-center gap-2">
+                <h4>Publicar</h4>
+                <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
+            </div>
+           
             <form className="d-flex flex-column gap-2" encType="multipart/form-data" onSubmit={handleSubmit}>
                 <input className="form-control" name="title" type="text" placeholder="Titulo"
                 value={postData.title} onChange={handleChange} />
@@ -115,7 +140,8 @@ export function PostArea({onPost}){
                 <div className="d-flex flex-row gap-3"> 
                     <label className="btn btn-outline-dark">
                         <i className="bi bi-paperclip"></i>    
-                        <input name="files[]" type="file" multiple title="Adjuntar Archivo"/>
+                        <input id="input-file" name="selectedFiles" type="file" multiple accept="image/*" 
+                         disabled={selectedFiles.length >= MAX} onChange={handleFiles} title="Adjuntar Imagenes"/>
                     </label>
                     
                     <button className="btn btn-outline-danger" type="button" title="Deshacer mensaje"
@@ -127,6 +153,16 @@ export function PostArea({onPost}){
                         <i className="bi bi-send"></i>
                     </button>
                 </div> 
+
+                {
+                    selectedFiles.length > 0 && 
+                    (<span>
+                        <i className="bi bi-image-fill"/> {selectedFiles.length}/{MAX}
+                        <ul>{selectedFiles.map((file,i) => (
+                                <li key={i}>{file.name}</li>))}
+                        </ul>
+                    </span>)
+                }
             </form>
         </div>  
     )

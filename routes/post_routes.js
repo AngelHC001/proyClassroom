@@ -2,36 +2,79 @@ import express from 'express';
 
 import sql from 'mssql';
 import { pool } from './db_connection.js';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
 const router = express.Router();
 
-//PUBLICAR INSERT Y DELETE
-router.post('/upload_post', async(req,res) => {
-    //recibe datos
-    const {remitent ,title, content, files} = req.body;
-    const date = new Date();
+//IMPORT multer
+//-config storage
+//-filtrar formatos (opcional)
+//-config upload
+//-set into server operation (post,put, delete, etc)
 
+//CONFIGURAR DESTINO Y archivos
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "appUploads/"); // tu carpeta destino
+  },
+  filename: (req, file, cb) => {
+    const unique = "UploadedImg" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${unique}${ext}`);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  allowed.includes(file.mimetype) ? cb(null, true) : cb(null, false);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB por archivo
+});
+
+//------FECHA HORA-------
+const DATE_SOURCE = new Date();
+function SetDate(){
+    let fecha = `${DATE_SOURCE.getFullYear()}-${DATE_SOURCE.getMonth() + 1}-${DATE_SOURCE.getDate()}`;
+    let hora = `${DATE_SOURCE.getHours()}:${DATE_SOURCE.getMinutes()}`;
+    
+    return `${fecha} ${hora}`;
+}
+
+
+//PUBLICAR INSERT Y DELETE
+router.post('/upload_post', upload.array('images',5), async(req,res) => {
+    //Recibe datos
+    const {remitent ,title, content} = req.body;
+    const files = req.files?.map((f) => f.filename) ?? [];
+    
     //Validacion debe haber al menos uno ocupado
-    if(!title && !content && files){
+    if((!title && !content) && files.lenght === 0){
         return res.status(400).json({ message: 'Todos los campos estan vacios' });
     }
 
+    if(!fs.existsSync('appUploads')){
+        return res.status(400).json('EL DIRECTORIO DE UPLOADS NO EXISTE');
+    }
+
     try {
-        //mover archivos si hay
-            //CODIGO MOVER A CARPETA (DELEGADO)
+        const today = SetDate(); 
+        const parsedUser = JSON.parse(remitent);
+        const chained = files.join('-');
 
-        //Preparar consulta (FORMATEAR FECHA DESPUES)
-        let fecha = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-        let hora = `${date.getHours()}:${date.getMinutes()}`;
-        let datosRemitente = `${remitent.matricula}-${remitent.nombre}`
-        let idRemitente = remitent.id;
-
+        //Preparar consulta       
         await pool.request()
             .input('titulo',sql.NVarChar,title)
             .input('contenido', sql.NVarChar,content)
-            .input('fechahora',sql.DateTime,`${fecha} ${hora}`)
-            .input('stringfiles',sql.NVarChar,files)
-            .input('remitente',sql.NVarChar,datosRemitente)
-            .input('idUsuario',sql.Int,idRemitente)
+            .input('fechahora',sql.DateTime,today)
+            .input('stringfiles',sql.NVarChar,chained)
+            .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
+            .input('idUsuario',sql.Int,parsedUser.id)
             .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
                 ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
         

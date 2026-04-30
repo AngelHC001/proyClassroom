@@ -23,7 +23,6 @@ function PostContainer({ mode, refreshKey, onRefresh }){
      //HANDLE onLike
     const handleLike = async(e, postId) => {
         manageMode ? e.preventDefault() : null;
-       
         try{
             await fetch(`http://localhost:3000/api/posts/like_post/${postId}`, { method:'POST' });
             onRefresh();
@@ -78,7 +77,7 @@ function PostContainer({ mode, refreshKey, onRefresh }){
     },[mode, user, refreshKey]);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'instant' });
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [data]);
 
     return(

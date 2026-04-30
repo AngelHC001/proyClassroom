@@ -32,7 +32,7 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
     }
 
     if(!fs.existsSync('appUserData')){
-        return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
+        return res.status(400).json('EL DIRECTORIO PARA FOTO DE PERFIL NO EXISTE');
     }
 
     try {
