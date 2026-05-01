@@ -46,7 +46,6 @@ function App() {
       {/* Redirección por defecto si la ruta no existe */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
-
   )
 }
 

@@ -1,4 +1,9 @@
 import { createContext, useContext, useState } from "react";
+
+//IMPORTAR CREATE, USE
+//EXPORTAR VARIABLE DE CREACION
+//EXPORTAR HOOK DE CREACION
+
 const AuthContext = createContext(null); 
 
 export const AuthProvider = ({children}) => {

@@ -1,16 +1,21 @@
 import React from "react";
-import { useAuth } from "../genUser-sections/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import { useAuth } from "../genUser-sections/AuthContext";
+import { useView } from "../components/viewContext";
 
 const IMGPATH = '../appUserData/';
 
-export function ProfileArea({activeView, setActiveView}){
+
+export function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
+    const { activeView, setActiveView } = useView(); //CONTEXTO DE COMPONENTE RIGHT SIDE
+    
     const navigate = useNavigate();
     
-    const btnLabel = activeView === 'my_posts' ? 'Volver' : 'Mis Posts';
-    const btnLabel2 = activeView === 'my_profile' ? 'Volver' : 'Mi Perfil';
+    const btnLabel = activeView.type === 'my_posts' ? 'Volver' : 'Mis Posts';
+    const btnLabel2 = activeView.type === 'my_profile' ? 'Volver' : 'Mi Perfil';
 
     const handleLogout = () => {
         logout();
@@ -29,12 +34,12 @@ export function ProfileArea({activeView, setActiveView}){
                 {user?.tipo === 0 ? 
                         <>
                             <button className="btn btn-outline-light btn-admin" onClick={() => 
-                                setActiveView(activeView === 'my_posts' ? 'posts' : 'my_posts')}>
+                                setActiveView(activeView.type === 'my_posts' ? {type : 'feed'} : {type : 'my_posts'} )}>
                                 <i className="bi bi-stickies-fill"></i> {btnLabel}
                             </button>
 
                             <button className="btn btn-success" onClick={() => 
-                                setActiveView(activeView === 'my_profile' ? 'posts' : 'my_profile')}>
+                                setActiveView(activeView.type === 'my_profile' ? {type : 'feed'} : {type:'my_profile'})}>
                                 <i className="bi bi-person-fill"></i> {btnLabel2}
                             </button>
                         </>
@@ -127,7 +132,10 @@ export function PostArea({onPost}){
         <div className="p-2">
             <div className="d-flex flex-row align-items-center gap-2">
                 <h4>Publicar</h4>
-                <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
+                {
+                    message.text && 
+                        <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
+                }
             </div>
            
             <form className="d-flex flex-column gap-2" encType="multipart/form-data" onSubmit={handleSubmit}>

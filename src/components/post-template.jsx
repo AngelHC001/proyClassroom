@@ -1,15 +1,16 @@
 import React from "react";
 
-
 const APP_PATH = '../appUploads/';
 
 function FileContainer({file}){
     return(
-        <a href={APP_PATH + file} download={APP_PATH + file} >
-            <img className="img-fluid rounded" src={APP_PATH + file} width="80" height="80"/>
+        <a href={APP_PATH + file}>
+            <img className="img-fluid rounded" src={APP_PATH + file} width="100" height="100"/>
         </a>
     )
 }
+
+// En el botón de comentarios dentro de PostContainer
 
 
 function Post({PostData, isManageEnabled = false, onLike, onDelete}){
@@ -40,7 +41,8 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
                      <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
 
-                <button className="btn btn-outline-light border-0 btn-sm">
+                <button className="btn btn-outline-light border-0 btn-sm" 
+                >
                      <i className="bi bi-chat fs-4"/> {PostData?.comentarios}      
                 </button>
 
