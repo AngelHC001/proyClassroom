@@ -6,7 +6,7 @@ import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
 
 const IMGPATH = '../appUserData/';
-
+const APIURL = import.meta.env.VITE_API_URL;
 
 export function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
@@ -101,6 +101,7 @@ export function PostArea({onPost}){
         formData.append('remitent', JSON.stringify(postData.remitent));
         formData.append('title',postData.title);
         formData.append('content', postData.content);
+        //mode
        
         selectedFiles.forEach((file) => {
             formData.append('images', file);
@@ -108,7 +109,7 @@ export function PostArea({onPost}){
 
         //HACER REQUEST
         try {
-            const response = await fetch('http://localhost:3000/api/posts/upload_post',{
+            const response = await fetch(`${APIURL}/posts/upload_post`,{
                 method:'POST',
                 body: formData
             });

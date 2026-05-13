@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import LoginContainer from "../components/center_container";
-
+const APIURL = import.meta.env.VITE_API_URL;
 
 async function OperationRegister(sendData) {
     try{
-        const response = await fetch('http://localhost:3000/api/register', {
+        const response = await fetch(`${APIURL}/register`, {
             method:'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(sendData)

@@ -4,7 +4,7 @@ import SectionHeader from "../components/section-header.jsx";
 
 
 const IMGPATH = '../appUserData/';
-
+const APIURL = import.meta.env.VITE_API_URL;
 
 function ChangePic({setMessage}){
     const { user, updateUser } = useAuth();
@@ -30,7 +30,7 @@ function ChangePic({setMessage}){
         formData.append('userOnline', JSON.stringify({id: user.id, mat: user.matricula}));
         
         try{
-            const response = await fetch('http://localhost:3000/api/profile/change_picture',{
+            const response = await fetch(`${APIURL}/profile/change_picture`,{
                 method: 'PUT',
                 body: formData             
             })
@@ -107,7 +107,7 @@ function ChangeData({setMessage}){
         }
 
         try{
-            const response = await fetch('http://localhost:3000/api/profile/rewrite_data',{
+            const response = await fetch(`${APIURL}/profile/rewrite_data`,{
                 method: 'PUT',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({newData, user})       

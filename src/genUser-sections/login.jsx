@@ -4,11 +4,11 @@ import { useState } from "react";
 import LoginContainer from "../components/center_container";
 
 import {useAuth} from "./AuthContext.jsx"
-
+const APIURL = import.meta.env.VITE_API_URL;
 
 async function OperationLogin(sendData) {
     try{
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch(`${APIURL}/login`, {
             method:'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(sendData)

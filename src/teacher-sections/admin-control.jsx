@@ -5,6 +5,7 @@ import DisplayError from "../components/error_banner.jsx";
 import LoadingSpinner from "../components/loading_spinner.jsx";
 import { useAuth } from "../genUser-sections/AuthContext.jsx"
 
+const APIURL = import.meta.env.VITE_API_URL; 
 
 function TableHeaders(){
     return(
@@ -55,7 +56,7 @@ function NewUser({onRefresh}){
         const packedData = {nombre: newUser.nombre, matricula: newUser.mat, tipo: userType}
 
         try{
-            const response = await fetch('http://localhost:3000/api/teacher/register_user',{
+            const response = await fetch(`${APIURL}/teacher/register_user`,{
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify(packedData) 
@@ -114,7 +115,7 @@ function AdminControl({refreshKey, onRefresh}){
         }
     
         try {
-            await fetch(`http://localhost:3000/api/teacher/erase_user/${userId}`, { method: 'DELETE' });
+            await fetch(`${APIURL}/teacher/erase_user/${userId}`, { method: 'DELETE' });
             onRefresh();
         } catch (error) {
             console.error('ERROR admin handleDelete', error.message)
@@ -130,7 +131,7 @@ function AdminControl({refreshKey, onRefresh}){
             setLoading(true);
             setError(null);
             try{
-                const response = await fetch('http://localhost:3000/api/teacher/list_users',{
+                const response = await fetch(`${APIURL}/teacher/list_users`,{
                     method: 'GET',
                     headers:{'Accept': 'application/json'},
                     signal: signal

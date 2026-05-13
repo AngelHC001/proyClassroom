@@ -9,6 +9,7 @@ import SectionHeader from "../components/section-header";
 import LoadingSpinner from "../components/loading_spinner";
 import DisplayError from "../components/error_banner";
 
+const APIURL = import.meta.env.VITE_API_URL;
 
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
@@ -27,7 +28,7 @@ function PostContainer({refreshKey, onRefresh }){
      //HANDLE onLike
     const handleLike = async(e, postId) => {
         try{
-            await fetch(`http://localhost:3000/api/posts/like_post/${postId}`, { method:'POST' });
+            await fetch(`${APIURL}/posts/like_post/${postId}`, { method:'POST' });
         } catch (error) {
             console.error(error.message);
         }
@@ -39,7 +40,7 @@ function PostContainer({refreshKey, onRefresh }){
         if(!confirm('¿Borrar Publicacion?')){ return; }
 
         try{
-            await fetch(`http://localhost:3000/api/posts/erase_post/${postId}`, { method:'DELETE' });
+            await fetch(`${APIURL}/posts/erase_post/${postId}`, { method:'DELETE' });
             onRefresh();
         } catch (error) {
             console.error(error.message);
@@ -54,7 +55,7 @@ function PostContainer({refreshKey, onRefresh }){
         
         const GetPosts = async() => { 
             try{
-                const response = await fetch('http://localhost:3000/api/posts/fetch_posts',{
+                const response = await fetch(`${APIURL}/posts/fetch_posts`,{
                     method:'POST',
                     headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ mode: activeView.type, userData: user}),
