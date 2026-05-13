@@ -13,8 +13,8 @@ function RightSide({refreshKey}){
 
     return(
         <div className="container-fluid ">
-            {activeView.type === 'feed' && <PostContainer mode={'all_posts'} refreshKey={refreshKey}/> }
-            {activeView.type === 'my_posts' &&  <PostContainer mode={'my_posts'} refreshKey={refreshKey} />}
+            {activeView.type === 'feed' && <PostContainer refreshKey={refreshKey}/> }
+            {activeView.type === 'my_posts' &&  <PostContainer refreshKey={refreshKey} />}
             {activeView.type === 'comment' && <CommentPost/>}
             {activeView.type === 'my_profile' && <EditSection/>}
         </div>

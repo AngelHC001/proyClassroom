@@ -60,6 +60,8 @@ export function ProfileArea(){
 
 export function PostArea({onPost}){
     const { user } = useAuth();
+    const { activeView } = useView();
+
     const [message, setMessage] = useState({color:'secondary', text:''});
     const [postData,setpostData] = useState({remitent: user, title:'',content:''});
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -131,7 +133,7 @@ export function PostArea({onPost}){
     return(
         <div className="p-2">
             <div className="d-flex flex-row align-items-center gap-2">
-                <h4>Publicar</h4>
+                <h4>{activeView.type === 'comment' ? 'Comentar' : 'Publicar'}</h4>
                 {
                     message.text && 
                         <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>

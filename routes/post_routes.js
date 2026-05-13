@@ -54,8 +54,8 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
     const files = req.files?.map((f) => f.filename) ?? [];
     
     //Validacion debe haber al menos uno ocupado
-    if((!title && !content) && files.lenght === 0){
-        return res.status(400).json({ message: 'Todos los campos estan vacios' });
+    if((title === '' && content === '') && files.lenght === 0){
+        return res.status(400).json({ message: 'No hay nada que publicar' });
     }
 
     if(!fs.existsSync('appUploads')){

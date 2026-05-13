@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { useView } from "../components/viewContext";
+
 
 import Post from "../components/post-template";
 import SectionHeader from "../components/section-header";
@@ -10,22 +12,22 @@ import DisplayError from "../components/error_banner";
 
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
-function PostContainer({ mode, refreshKey, onRefresh }){
+function PostContainer({refreshKey, onRefresh }){
     const { user } = useAuth();
+    const { activeView } = useView();
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState([]);
     const bottomRef = useRef(null);
     
-    const label = mode === 'my_posts' ? 'Mis Posts' : 'Actividad';
-    const manageMode = (mode === 'my_posts') || mode === ('user_posts') ? true : false;
+    const label = activeView.type === 'my_posts' ? 'Mis Posts' : 'Actividad';
+    const manageMode = (activeView.type === 'my_posts') || (activeView.type === 'user_posts') ? true : false;
 
      //HANDLE onLike
     const handleLike = async(e, postId) => {
-        manageMode ? e.preventDefault() : null;
         try{
             await fetch(`http://localhost:3000/api/posts/like_post/${postId}`, { method:'POST' });
-            onRefresh();
         } catch (error) {
             console.error(error.message);
         }
@@ -55,7 +57,7 @@ function PostContainer({ mode, refreshKey, onRefresh }){
                 const response = await fetch('http://localhost:3000/api/posts/fetch_posts',{
                     method:'POST',
                     headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ mode: mode, userData: user}),
+                    body: JSON.stringify({ mode: activeView.type, userData: user}),
                     signal: controller.signal
                 });
                 const results = await response.json();
@@ -74,7 +76,7 @@ function PostContainer({ mode, refreshKey, onRefresh }){
 
         GetPosts();
         return () => controller.abort();
-    },[mode, user, refreshKey]);
+    },[activeView.type, user, refreshKey]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
