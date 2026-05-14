@@ -8,13 +8,13 @@ import { ViewContext } from "../components/viewContext";
 //posts
 //my_posts
 //my_profile 
-function RightSide({refreshKey}){
+function RightSide(){
     const { activeView } = useContext(ViewContext);
 
     return(
-        <div className="container-fluid ">
-            {activeView.type === 'feed' && <PostContainer refreshKey={refreshKey}/> }
-            {activeView.type === 'my_posts' &&  <PostContainer refreshKey={refreshKey} />}
+        <div className="col-md-8 right-side">
+            {activeView.type === 'feed' && <PostContainer/> }
+            {activeView.type === 'my_posts' &&  <PostContainer/>}
             {activeView.type === 'comment' && <CommentPost/>}
             {activeView.type === 'my_profile' && <EditSection/>}
         </div>

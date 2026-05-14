@@ -1,24 +1,72 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useView } from "../components/viewContext";
 
 import SectionHeader from "../components/section-header";
 import Post from "../components/post-template";
+import Comment from "../components/postComment-template";
+
+const APIURL = import.meta.env.APIURL; 
 
 function CommentPost(){
     const { activeView, setActiveView } = useView();
-    const keys = ["idPost", "titulo", "contenido", 
-                    "fechahora","stringfiles", "likes", "comentarios", "remitente", "idUsuario"];
+    const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
+                    "comentarios", "remitente", "idUsuario"];
+    
     const values = activeView.postTarget;
-
-    //console.log(values)
-    // Validación: ambos arrays deben tener la misma longitud
     if (keys.length !== values.length) {
         throw new Error("Los arrays de claves y valores no tienen la misma longitud");
     }
-
     // Conversión a objeto
     const obj = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
+    
+    //SECCION COMENTARIOS CARGA Y DESPLIEGUE
+    const [comments, setComments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const bottomRef = useRef(null);
+    
+    /*
+    useEffect(()=>{    
+        const controller = new AbortController();
+        setLoading(true);
+        setError(null);
+        
+        const GetComments = async() => { 
+            try{
+                const response = await fetch(`${APIURL}/posts/fetch_comments`,{
+                    method:'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ mode: activeView.type, userData: user}),
+                    signal: controller.signal
+                });
+                const results = await response.json();
+                setData(results);   
+                
+            } catch (error) {
+                //ver si atrapa mensaje o lista vacia
+                if (error.name === 'AbortError') return;
+                setError(error);
+                console.error(error.message);         
+            }
+            finally{
+                setLoading(false);
+            }
+        }
+
+        GetPosts();
+        return () => controller.abort();
+    },[activeView.type, user]);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [data]);
+    */
+
+
+
+
+    
     return(
         <div className="container-fluid text-light">
             <SectionHeader title={'Ver Publicacion'} iconClass={'sticky'}/>
@@ -31,19 +79,9 @@ function CommentPost(){
 
                 <Post PostData={obj}/>
 
-                <div className="d-flex flex-column">
-                    <div className="rounded p-2 border-bottom bg-dark">
-                        <div className="d-flex justify-content-between border-bottom">
-                            <span>TR-000 Kitachan</span>
-                            <span>DD/MM/YYYY 11:11am</span>
-                        </div>
-                     
-                        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
-                        Consectetur commodi officia, culpa assumenda beatae corporis 
-                        dignissimos explicabo sapiente </p>
-                    </div>
-                </div>
-                
+                 <div className="d-flex flex-column">
+                    <Comment/>
+                 </div>
             </div>
         </div>   
     ) 

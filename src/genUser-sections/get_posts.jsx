@@ -1,19 +1,47 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
+
 import { useAuth } from "./AuthContext";
 import { useView } from "../components/viewContext";
-
 
 import Post from "../components/post-template";
 import SectionHeader from "../components/section-header";
 import LoadingSpinner from "../components/loading_spinner";
-import DisplayError from "../components/error_banner";
+import DisplayError from "../components/error_banner"
 
 const APIURL = import.meta.env.VITE_API_URL;
 
+
+//HANDLE onLike
+const handleLike = async(e, postId) => {
+    e.preventDefault();
+    try{
+        await fetch(`${APIURL}/posts/like_post/${postId}`, { method:'POST' });
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+
+//HANDLE onDelete
+const handleDelete = async(e, postId) => {
+    e.preventDefault();
+    if(!confirm('¿Borrar Publicacion?')){ return; }
+
+    try{
+        await fetch(`${APIURL}/posts/erase_post/${postId}`, { method:'DELETE' });
+    } 
+    catch (error) {
+        console.error(error.message);
+        alert('OCURRIO UN ERROR AL BORRAR');               
+    }
+}
+
+
+
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
-function PostContainer({refreshKey, onRefresh }){
+function PostContainer(){
     const { user } = useAuth();
     const { activeView } = useView();
 
@@ -24,29 +52,6 @@ function PostContainer({refreshKey, onRefresh }){
     
     const label = activeView.type === 'my_posts' ? 'Mis Posts' : 'Actividad';
     const manageMode = (activeView.type === 'my_posts') || (activeView.type === 'user_posts') ? true : false;
-
-     //HANDLE onLike
-    const handleLike = async(e, postId) => {
-        try{
-            await fetch(`${APIURL}/posts/like_post/${postId}`, { method:'POST' });
-        } catch (error) {
-            console.error(error.message);
-        }
-    }
-
-    //HANDLE onDelete
-    const handleDelete = async(e, postId) => {
-        e.preventDefault();
-        if(!confirm('¿Borrar Publicacion?')){ return; }
-
-        try{
-            await fetch(`${APIURL}/posts/erase_post/${postId}`, { method:'DELETE' });
-            onRefresh();
-        } catch (error) {
-            console.error(error.message);
-            alert('OCURRIO UN ERROR AL BORRAR');               
-        }
-    }
 
     useEffect(()=>{    
         const controller = new AbortController();
@@ -77,7 +82,7 @@ function PostContainer({refreshKey, onRefresh }){
 
         GetPosts();
         return () => controller.abort();
-    },[activeView.type, user, refreshKey]);
+    },[activeView.type, user]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

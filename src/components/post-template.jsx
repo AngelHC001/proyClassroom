@@ -1,7 +1,5 @@
 import React from "react";
 import { useView } from "./viewContext";
-
-
 const APP_PATH = '../appUploads/';
 
 function FileContainer({file}){
@@ -12,9 +10,8 @@ function FileContainer({file}){
     )
 }
 
+
 // En el botón de comentarios dentro de PostContainer
-
-
 function Post({PostData, isManageEnabled = false, onLike, onDelete}){
     const {activeView, setActiveView} = useView(); 
     
