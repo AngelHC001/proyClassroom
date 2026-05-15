@@ -50,7 +50,7 @@ function SetDate(){
 //PUBLICAR INSERT Y DELETE
 router.post('/upload_post', upload.array('images',5), async(req,res) => {
     //Recibe datos
-    const {remitent ,title, content} = req.body;
+    const {remitent ,title, content, mode, postTarget} = req.body;
     const files = req.files?.map((f) => f.filename) ?? [];
     
     //Validacion debe haber al menos uno ocupado
@@ -67,19 +67,43 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
         const parsedUser = JSON.parse(remitent);
         const chained = files.join('-');
 
-        //Preparar consulta       
-        await pool.request()
-            .input('titulo',sql.NVarChar,title)
-            .input('contenido', sql.NVarChar,content)
-            .input('fechahora',sql.DateTime,today)
-            .input('stringfiles',sql.NVarChar,chained)
-            .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
-            .input('idUsuario',sql.Int,parsedUser.id)
-            .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
-                ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');
-        
+        if(mode === 'feed'){
+            //PROCESO NORMAL DE POSTS    
+            await pool.request()
+                .input('titulo',sql.NVarChar,title)
+                .input('contenido', sql.NVarChar,content)
+                .input('fechahora',sql.DateTime,today)
+                .input('stringfiles',sql.NVarChar,chained)
+                .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
+                .input('idUsuario',sql.Int,parsedUser.id)
+                .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
+                    ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');  
+        }
+        else if(mode === 'comment')
+        {      
+            //Validacion debe haber al menos uno ocupado
+            if(!postTarget){
+                return res.status(400).json({ message: 'Sin requisitos para comentar' });
+            }
+
+            await pool.request()
+                .input('contenido', sql.NVarChar,content)
+                .input('fechahora',sql.DateTime,today)
+                .input('stringfiles',sql.NVarChar,chained)
+                .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
+                .input('idUsuario',sql.Int, parsedUser.id)
+                .input('idPost', sql.Int, postTarget)
+                .query('INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO,IDPOST)' +
+                    ' VALUES (@contenido, @fechahora, @stringfiles, @remitente, @idUsuario, @idPost)');
+            
+            //Actualizar comentarios de Post
+            await pool.request()
+            .input('idPost', sql.Int, postTarget)
+            .query('UPDATE POST SET COMENTARIOS = COMENTARIOS + 1 WHERE IDPOST = @idPost');
+        }
+
         //Dar positivo
-        res.status(200).json({message: 'Se publicó tu post'})        
+        res.status(200).json({message: 'Publicado'})        
     } catch (error) {
         console.error('Error en el insert:', error);
         res.status(500).json({message: 'Error interno del servidor (PUBLICAR)'});     

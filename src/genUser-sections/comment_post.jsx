@@ -1,12 +1,14 @@
 import React from "react";
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect } from "react";
 import { useView } from "../components/viewContext";
 
 import SectionHeader from "../components/section-header";
 import Post from "../components/post-template";
 import Comment from "../components/postComment-template";
+import LoadingSpinner from '../components/loading_spinner'
+import DisplayError from '../components/error_banner'
 
-const APIURL = import.meta.env.APIURL; 
+const APIURL = import.meta.env.VITE_API_URL; 
 
 function CommentPost(){
     const { activeView, setActiveView } = useView();
@@ -24,9 +26,8 @@ function CommentPost(){
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const bottomRef = useRef(null);
     
-    /*
+    
     useEffect(()=>{    
         const controller = new AbortController();
         setLoading(true);
@@ -34,15 +35,12 @@ function CommentPost(){
         
         const GetComments = async() => { 
             try{
-                const response = await fetch(`${APIURL}/posts/fetch_comments`,{
-                    method:'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ mode: activeView.type, userData: user}),
+                const response = await fetch(`${APIURL}/comments/fetch_comment/${values[0]}`,{
+                    method:'GET',
                     signal: controller.signal
                 });
                 const results = await response.json();
-                setData(results);   
-                
+                setComments(results);   
             } catch (error) {
                 //ver si atrapa mensaje o lista vacia
                 if (error.name === 'AbortError') return;
@@ -54,19 +52,11 @@ function CommentPost(){
             }
         }
 
-        GetPosts();
+        GetComments();
         return () => controller.abort();
-    },[activeView.type, user]);
+    },[activeView.type,values]);
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [data]);
-    */
-
-
-
-
-    
+  
     return(
         <div className="container-fluid text-light">
             <SectionHeader title={'Ver Publicacion'} iconClass={'sticky'}/>
@@ -80,7 +70,13 @@ function CommentPost(){
                 <Post PostData={obj}/>
 
                  <div className="d-flex flex-column">
-                    <Comment/>
+                    {
+                        error ? <DisplayError/> :
+                            loading ? <LoadingSpinner/> :
+                                comments.map((c) => (
+                                    <Comment key={c?.idComentario} CommentData={c} />
+                                ))
+                    }
                  </div>
             </div>
         </div>   

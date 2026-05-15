@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
-
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
+
 const APIURL = import.meta.env.VITE_API_URL;
 
 
@@ -46,11 +46,21 @@ function PostArea(){
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
+        
+        if(activeView.type === 'feed'){
+            formData.append('title',postData.title);
+        }
+        
+        if(activeView.type === 'comment'){
+            console.log(activeView.postTarget);
+            formData.append('postTarget', activeView?.postTarget[0]);
+        }
+        
+        formData.append('mode', activeView.type);
+        formData.append('content', postData.content); 
         formData.append('remitent', JSON.stringify(postData.remitent));
-        formData.append('title',postData.title);
-        formData.append('content', postData.content);
-        //mode
        
+        //FILES
         selectedFiles.forEach((file) => {
             formData.append('images', file);
         });

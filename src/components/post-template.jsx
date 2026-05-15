@@ -41,7 +41,6 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
                     onClick={(e) => onLike(e,PostData?.idPost)}>
                      <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
-
                 
                 <button className="btn btn-outline-light border-0 btn-sm" disabled={activeView.type === 'comment'}
                 onClick={() => setActiveView({type: 'comment', postTarget: Object.values(PostData)})} >

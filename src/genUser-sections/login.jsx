@@ -8,7 +8,7 @@ const APIURL = import.meta.env.VITE_API_URL;
 
 async function OperationLogin(sendData) {
     try{
-        const response = await fetch(`${APIURL}/login`, {
+        const response = await fetch(`${APIURL}/session/login`, {
             method:'POST',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify(sendData)
