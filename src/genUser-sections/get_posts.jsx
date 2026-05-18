@@ -111,7 +111,8 @@ function PostContainer(){
                     onLike={() => MutationLike.mutate(post?.idPost)}
                     onDelete={handleDelete}/>))
                 }
-            
+
+                <div ref={bottomRef}></div>        
                 <br/>        
             </div>
         </div>

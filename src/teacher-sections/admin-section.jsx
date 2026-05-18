@@ -1,10 +1,12 @@
-import React, {useState} from "react"
+import React, {useContext, useState} from "react"
+import { useView, ViewContext } from "../components/viewContext";
 import { Link } from "react-router-dom";
 
 import EditSection from "../genUser-sections/edit_profile";
 import PostContainer from "../genUser-sections/get_posts";
 import AdminControl from "./admin-control";
 import AdminFiles from "./admin-files";
+
 
 const db_items = [
     {
@@ -41,7 +43,9 @@ const db_items = [
 ];
 
 
-function AdminLeftBar({setActiveView}){
+function AdminLeftBar(){
+    const { setActiveView } = useView();
+
     return(
         <div className="col-md-4 left-side text-center p-3">
             <h2 className="display-6">Administrar Clase</h2>
@@ -49,9 +53,9 @@ function AdminLeftBar({setActiveView}){
                
             <div className="d-flex flex-column gap-2">
                 {
-                    db_items.map((x) => (
+                    db_items?.map((x) => (
                         <button key={x.key} className="btn btn-outline-dark" 
-                            onClick={() => setActiveView(x.piece)}>  
+                            onClick={() => setActiveView({type: x.piece})}>  
                             <i className={x.icon}></i> {x.sectionName}
                         </button> 
                     ))
@@ -75,36 +79,34 @@ function AdminLeftBar({setActiveView}){
     )
 }
 
-function AdminRightSide({activeView = ''}){
+function AdminRightBar(){
+    const { activeView } = useContext(ViewContext);
     const [refreshKey,setRefreshKey] = useState(0);
     return(
+
         <div className="col-md-8 right-side">
-            {activeView === 'users_control' &&  <AdminControl refreshKey={refreshKey} 
+            {activeView.type === 'users_control' &&  <AdminControl refreshKey={refreshKey} 
                                                 onRefresh={() => setRefreshKey(k =>  k + 1)}/>}
-            
-            {activeView === 'my_profile' && <EditSection/>}
-            
-            {activeView === 'my_posts' &&  <PostContainer mode={'my_posts'} 
-                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)}/>}
-            
-            {activeView === 'manage_posts' &&  <PostContainer mode={'user_posts'} 
-                                                refreshKey={refreshKey} onRefresh={() => setRefreshKey(k => k + 1)}/>}
-            
-            {activeView === 'manage_files' &&  <AdminFiles/>} 
+            {activeView.type === 'my_profile' && <EditSection/>}
+            {activeView.type === 'my_posts' && <PostContainer/>}
+            {activeView.type === 'manage_posts' && <PostContainer/>}
+            {activeView.type === 'manage_files' && <AdminFiles/>} 
         </div>
     )
 }
 
 function AdminSection(){
-    const [activeView, setActiveView] = useState('my_profile');
-
+    const [activeView, setActiveView] = useState({type: 'my_profile'});
+   
     return(
-        <div className="container-fluid">
-            <div className="row">
-                <AdminLeftBar activeView={activeView} setActiveView={setActiveView}/>
-                <AdminRightSide activeView={activeView}/>
+        <ViewContext.Provider value={{activeView, setActiveView}}>
+            <div className="container-fluid">
+                <div className="row">
+                    <AdminLeftBar/>
+                    <AdminRightBar/>
+                </div>
             </div>
-        </div>
+        </ViewContext.Provider>
     )    
 }
 

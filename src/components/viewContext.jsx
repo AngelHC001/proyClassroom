@@ -9,6 +9,6 @@ export const ViewContext = createContext(null);
 
 export function useView(){
     const ctx = useContext(ViewContext);
-    if(!ctx) throw new Error('Use view debe usarse en MainSection');
+    if(!ctx) throw new Error('Use view debe usarse en MainSection o AdminSection');
     return ctx;
 }

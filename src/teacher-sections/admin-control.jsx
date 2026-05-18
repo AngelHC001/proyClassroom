@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import SectionHeader from "../components/section-header";
 import DisplayError from "../components/error_banner.jsx";
 import LoadingSpinner from "../components/loading_spinner.jsx";
 import { useAuth } from "../genUser-sections/AuthContext.jsx"
+import {useView} from "../components/viewContext.jsx"
+
 
 const APIURL = import.meta.env.VITE_API_URL; 
 
@@ -26,7 +29,7 @@ function UserDataContainer({userData, onDelete}){
             <td>{userData?.TIPOUSUARIO === 0 ? 'Alumno' : 'Administrador'}</td>
             <td>
                 <button className="btn btn-sm btn-danger" type="submit" title="Borrar" 
-                 onClick={(e) => onDelete(e,userData?.IDUSUARIO)}>
+                 onClick={() => onDelete(userData?.IDUSUARIO)}>
                     <i className="bi bi-dash-circle-fill"/>
                 </button>
             </td>
@@ -34,21 +37,48 @@ function UserDataContainer({userData, onDelete}){
     )
 }
 
-function NewUser({onRefresh}){
+//FUNCION INSERT
+function NewUser(){
+    const { user } = useAuth();
+    const { activeView } = useView();
+    const queryClient = useQueryClient();
+
     const [newUser, setNewUser] = useState({nombre:'', mat:''})
     const [isAdmin, setIsAdmin] = useState(false);
 
     const handleChange = (e) => {
         const {name,value} = e.target;
-        setNewUser((prev) => ({
-            ...prev,
-            [name]:value
-        }))
+        setNewUser((prev) => ({...prev, [name]:value}))
     }
 
-    const handleCheck = (e) => {
-        setIsAdmin(e.target.checked);
-    } 
+    const handleCheck = (e) => { setIsAdmin(e.target.checked); } 
+
+    //MUTATION RELOAD
+    const newUserMutation = useMutation({
+        mutationFn: async (newUserData) => {
+            const response = await fetch(`${APIURL}/teacher/register_user`,{
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(newUserData) 
+            });
+            
+            if(!response.ok){
+                const errData = await response.json();
+                throw new Error(errData.message);
+            }
+
+            return response.json();             
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey:['users_control', activeView.type, user?.id]});
+            setNewUser({nombre:'', mat:''});
+            alert('Usuario Registrado');
+        },
+        onError: (error) => {
+            console.error("Error al registrar usuario:", error);
+        }
+    })
+    
 
     const handleSubmit = async(e) => {
         e.preventDefault();
@@ -56,22 +86,8 @@ function NewUser({onRefresh}){
         const packedData = {nombre: newUser.nombre, matricula: newUser.mat, tipo: userType}
 
         try{
-            const response = await fetch(`${APIURL}/teacher/register_user`,{
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify(packedData) 
-            });
-
-            if(!response.ok){
-                const errData = await response.json();
-                throw new Error(errData.message);
-            }
-
-            //Positivos
-            setNewUser({nombre:'', mat:''});
-            const data = await response.json();
-            alert(data.message);
-            onRefresh();
+            //HACER REQUEST
+            newUserMutation.mutate(packedData);
         }
         catch(error){
             console.error(error.message);
@@ -102,36 +118,42 @@ function NewUser({onRefresh}){
 }
 
 
-function AdminControl({refreshKey, onRefresh}){
+
+function AdminControl(){
     const { user } = useAuth();
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const { activeView } = useView();
+    const queryClient = useQueryClient();
 
-    const handleDelete = async(e, userId) => {
-        e.preventDefault();
-        if(!confirm('¿Eliminar este alumno del grupo?')){
-            return;
-        }
-    
-        try {
-            await fetch(`${APIURL}/teacher/erase_user/${userId}`, { method: 'DELETE' });
-            onRefresh();
-        } catch (error) {
+    //MUTATION DELETE
+    const deleteMutation = useMutation({
+        mutationFn: async(userId) => {
+            if(!confirm('¿Eliminar este alumno del grupo?')){ return; }
+            
+            const response = await fetch(`${APIURL}/teacher/erase_user/${userId}`, { 
+                method: 'DELETE' 
+            });
+      
+            if (!response.ok) throw new Error('Error al borrar');
+            return response.json();
+        },
+        onError: (error) => {
             console.error('ERROR admin handleDelete', error.message)
-            alert('Ocurrio un error al borrar');
+            alert('Error al borrar usuario');
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users_control'] });
         }
-    }
+    });
 
-    useEffect(() => {
-        const controller = new AbortController();
-        const signal = controller.signal;
 
-        async function fetchUsers(){
-            setLoading(true);
-            setError(null);
-            try{
-                const response = await fetch(`${APIURL}/teacher/list_users`,{
+    //MUTATION GET
+    const { data, isPending, isError} = useQuery({
+            queryKey: ['users_control', activeView.type, user?.id],
+            queryFn: async () => {
+                const controller = new AbortController();
+                const signal = controller.signal;
+
+                 const response = await fetch(`${APIURL}/teacher/list_users`,{
                     method: 'GET',
                     headers:{'Accept': 'application/json'},
                     signal: signal
@@ -141,44 +163,31 @@ function AdminControl({refreshKey, onRefresh}){
                     const errs = await response.json(); 
                     throw new Error(errs.message);
                 }
-
-                const data = await response.json();
-                setUsers(data);
-            }
-            catch(err){
-                setError(err);
-                if (err.name !== "AbortError") { return; }
-                console.error('ALGO SALIO MAL', err.message)
-            }
-            finally{
-                setLoading(false);
-            }
-        }
-        
-        fetchUsers();
-        return () => {controller.abort();}
-    },[refreshKey]);
+                return response.json();
+            }, 
+            enabled: !!user?.id
+    });
 
     return(
         <div className="d-flex flex-column gap-2 text-light">
             <SectionHeader title={"Control de Usuarios"} iconClass={'people-fill'}/>
-            <NewUser onRefresh={onRefresh}/>
+            <NewUser/>
 
             <div className="post-space">
-                {
-                    error ? <DisplayError/> :
-                        loading ? <LoadingSpinner/> : 
-                        <table className="table table-bordered mt-1 text-center">
-                            <tbody>
-                                <TableHeaders/>
-                                {
-                                    users.map((u) => (u.IDUSUARIO === user?.id ? '':
-                                        <UserDataContainer key={u.IDUSUARIO} 
-                                        userData={u} onDelete={handleDelete}/>))
-                                }
-                            </tbody>
-                        </table>
-                }
+                {isError && <DisplayError/>}
+                {isPending && <LoadingSpinner/> } 
+                        
+                <table className="table table-bordered mt-1 text-center">
+                    <tbody>
+                        <TableHeaders/>
+                        {
+                            data?.map((u) => (u.IDUSUARIO !== user?.id &&
+                                <UserDataContainer key={u.IDUSUARIO} 
+                                userData={u} onDelete={() => deleteMutation.mutate(u?.IDUSUARIO)}/>))
+                        }
+                    </tbody>
+                </table>
+                
                 <br/>
                 <br/>
                 <br/>    
