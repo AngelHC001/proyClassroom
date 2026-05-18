@@ -1,20 +1,49 @@
 import React from "react";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
-
 const APIURL = import.meta.env.VITE_API_URL;
 
 
 function PostArea(){
     const { user } = useAuth();
     const { activeView } = useView();
+    const queryClient = useQueryClient();
 
     const [message, setMessage] = useState({color:'secondary', text:''});
     const [postData,setpostData] = useState({remitent: user, title:'',content:''});
     const [selectedFiles, setSelectedFiles] = useState([]);
     const MAX = 5;
-    
+
+    //MUTATION RELOAD
+    const mutation = useMutation({
+        mutationFn: async (postData) => {
+            const response = await fetch(`${APIURL}/posts/upload_post`,{
+                method:'POST',
+                body: postData
+            })
+            
+            if (!response.ok) {
+                throw new Error('Error al subir el post');
+            }
+
+            return response.json(); // Esto es lo que debe retornar la función
+            
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey:['posts', activeView.type, user?.id]});
+            setMessage({color: 'success', text: 'Publicado'});
+            clearFields();
+        },
+        onError: (error) => {
+            console.error("Error al publicar:", error);
+            setMessage({color: 'danger', text: 'Error Algo salió mal'});
+        }
+    })
+
     const handleChange = (e) => {
         const {name,value} = e.target;
         setpostData((prev) => ({
@@ -66,26 +95,7 @@ function PostArea(){
         });
 
         //HACER REQUEST
-        try {
-            const response = await fetch(`${APIURL}/posts/upload_post`,{
-                method:'POST',
-                body: formData
-            });
-
-            if(!response.ok){
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Algo salio mal');
-            }
-
-            //Resultados
-            const result = await response.json(); 
-            setMessage({color: 'success', text: result.message});
-            clearFields();
-            
-        } catch (error) {
-            console.error('Error al registrar:', error.message);
-            setMessage({color: 'danger', text: 'Error Algo salió mal'});
-        }
+        mutation.mutate(formData);
     }
 
     return(

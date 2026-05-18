@@ -143,8 +143,10 @@ router.post('/fetch_posts', async(req,res) => {
     }
 });
 
-router.post('/like_post/:id', async(req,res) => {
+router.get('/like_post/:id', async(req,res) => {
     const postTarget = req.params.id;
+
+    console.log(postTarget);
 
     if(!postTarget){
         return res.status(400).json({ message: 'No hay post' });
