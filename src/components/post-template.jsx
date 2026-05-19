@@ -18,6 +18,18 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
     const fecha = new Date(PostData?.fechahora);    
     const fileChain = PostData?.stringfiles.split('-') ?? [];
 
+    const handleLikeClick = (e) => {
+        e.preventDefault();
+        onLike(PostData?.idPost);
+    }
+
+    const handleDeleteClick = (e) => {
+        e.preventDefault();
+        if(confirm('Seguro que quieres borrar este Post?')){
+            onDelete(PostData?.idPost);
+        }
+    }
+
     return(
         <div className="card border-0 post text-light me-2">
             <div className="card-header border-light d-flex justify-content-between align-items-center">
@@ -38,7 +50,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
 
             <form className="card-footer border-top-light d-flex gap-2">
                 <button className="btn btn-outline-light border-0 btn-sm"
-                    onClick={() => onLike(PostData?.idPost)}>
+                    onClick={handleLikeClick}>
                      <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
                 
@@ -50,7 +62,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
 
                 {isManageEnabled &&   
                     (<button className="btn btn-outline-light border-0 btn-sm"
-                        onClick={() => onDelete(PostData?.idPost)}>
+                        onClick={handleDeleteClick}>
                          <i className="bi bi-dash-circle text-danger fs-4"/>      
                     </button>)
                 }

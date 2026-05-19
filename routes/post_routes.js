@@ -146,10 +146,8 @@ router.post('/fetch_posts', async(req,res) => {
 router.get('/like_post/:id', async(req,res) => {
     const postTarget = req.params.id;
 
-    console.log(postTarget);
-
     if(!postTarget){
-        return res.status(400).json({ message: 'No hay post' });
+        return res.status(400).json({ message: 'No hay post que dar like' });
     }
 
     try {
@@ -173,6 +171,12 @@ router.delete('/erase_post/:id',async(req,res) => {
     }
 
     try {
+        //BORRAR SUS COMENTARIOS
+        await pool.request()
+            .input('idPost', sql.Int, postTarget)
+            .query('DELETE FROM COMENTARIO WHERE IDPOST = @idPost');
+
+        //BORRAR POST
         await pool.request()
             .input('idPost', sql.Int, postTarget)
             .query('DELETE FROM POST WHERE IDPOST = @idPost');

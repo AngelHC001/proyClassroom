@@ -18,8 +18,6 @@ const APIURL = import.meta.env.VITE_API_URL;
 function PostContainer(){
     const { user } = useAuth();
     const { activeView } = useView();
-    const bottomRef = useRef(null);
-    const controller = new AbortController();
     const queryClient = useQueryClient();
     
     const label = activeView.type === 'my_posts' ? 'Mis Posts' : 'Actividad';
@@ -29,6 +27,8 @@ function PostContainer(){
     const { data, isPending, isError} = useQuery({
         queryKey: ['posts', activeView.type, user?.id],
         queryFn: async () => {
+            const controller = new AbortController();
+
             const response = await fetch(`${APIURL}/posts/fetch_posts`,{
                 method:'POST',
                 headers: {'Content-Type':'application/json'},
@@ -48,57 +48,87 @@ function PostContainer(){
     //FUNCION ON DELETE
     const MutationDelete = useMutation({
         mutationFn: async (postId) => {
-            if(!confirm('¿Borrar Publicacion?')){ return; }
-
             const response = await fetch(`${APIURL}/posts/erase_post/${postId}`, { method: 'DELETE'});
-
-            if(!response.ok){ throw new Error('Error al borrar post');}
+            if(!response.ok) throw new Error('Error al borrar post (MIS POSTS)'); 
             return response.json();
         },
-        onSuccess: () => {
-            // Al dar like, solo queremos que se actualicen los contadores
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
-        }
 
+        onMutate: async(idPost) => {
+            await queryClient.cancelQueries({ queryKey: ['posts', activeView.type, user?.id] });
+            const previousPosts = queryClient.getQueryData(['posts', activeView.type, user?.id]);
+            queryClient.setQueryData(['posts', activeView.type, user?.id], (old) => {
+                return old ? old.filter(post => post.idPost !== idPost) : [];
+            });
+
+            return { previousPosts }
+        },
+
+        onError: (err, idPost, context) => {
+            // Si el backend falla, restauramos el post eliminado
+            queryClient.setQueryData(['posts', activeView.type, user?.id], context.previousPosts);
+            alert("No se pudo eliminar el post. Intentelo de nuevo.");
+        },
+
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['posts', activeView.type, user?.id] });
+        }
     });
 
-    //FUNCION LIkE
+    //FUNCION ON LIKE
     const MutationLike = useMutation({
-        mutationFn: async (postId) => {
-            const response = await fetch(`${APIURL}/posts/like_post/${postId}`, 
+        mutationFn: async (idPost) => {
+            const response = await fetch(`${APIURL}/posts/like_post/${idPost}`, 
                 { method:'GET' });
+            
+            if (!response.ok) throw new Error('Error al procesar el like');
             return response.json();
         },
-        //FUNCION AL DAR CLICK
-        onMutate: async(postId) => {
-            await queryClient.cancelQueries({ queryKey: ['posts'] });
-            const previusPosts = await queryClient.getQueryData(['posts']);
         
-            //actualizar cache
-            queryClient.setQueryData(['posts'], (old) => {
-                return old.map((post) =>
-                    post.id === postId 
-                    ? { ...post, likes: post.likes + 1, userLiked: true } 
-                    : post
-                );
+        onMutate: async(idPost) => {
+            const queryKey = ['posts', activeView.type, user?.id];
+            await queryClient.cancelQueries({ queryKey });
+
+            const previusPosts = queryClient.getQueryData(queryKey);
+        
+            //Actualizar Cache
+            queryClient.setQueryData(queryKey, (oldData) => {
+                return oldData.map((post) => {
+                    if(post.idPost === idPost)
+                        return { ...post, likes: post.likes + 1 } 
+                    
+                    return post;
+                });
             });
-            
-            return previusPosts;
+            return { previusPosts };
         },
 
-        onError: (err, postId, context) => {
-            queryClient.setQueryData(['posts'], context.previousPosts);
+        onError: (err, idPost, context) => {
+            const queryKey = ['posts', activeView.type, user?.id];
+            if (context?.previousPosts) {
+                queryClient.setQueryData(queryKey, context.previousPosts);
+            }
             console.error("No se pudo dar like, revirtiendo...");
         },
 
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
+            queryClient.invalidateQueries({ queryKey: ['posts', activeView.type, user?.id] });
         }      
     });
 
+    //CONTROLAR SCROLL AL MODIFICAR
+    const bottomRef = useRef(0);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+        if(!data){ return; }
+
+        const hayNuevoPost = data?.lenght > bottomRef.current;
+        if(hayNuevoPost){
+            bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        //actualizar ref
+        bottomRef.current = data?.lenght;
     }, [data]);
   
     return(

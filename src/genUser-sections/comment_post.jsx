@@ -1,4 +1,6 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "./AuthContext";
 import { useView } from "../components/viewContext";
 
 import SectionHeader from "../components/section-header";
@@ -6,24 +8,23 @@ import Post from "../components/post-template";
 import Comment from "../components/postComment-template";
 import LoadingSpinner from '../components/loading_spinner'
 import DisplayError from '../components/error_banner'
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "./AuthContext";
 
 const APIURL = import.meta.env.VITE_API_URL; 
+const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
+                    "comentarios", "remitente", "idUsuario"];
+    
 
 function CommentPost(){
     const { user } = useAuth();
     const { activeView, setActiveView } = useView();
-    const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
-                    "comentarios", "remitente", "idUsuario"];
     
+    //CONVERSION A OBJETO
     const values = activeView.postTarget;
     if (keys.length !== values.length) {
         throw new Error("Los arrays de claves y valores no tienen la misma longitud");
     }
-    // Conversión a objeto
-    const obj = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-    
+
+    const obj = Object.fromEntries(keys.map((key, index) => [key, values[index]]));    
        
     //FETCH COMMENTS DEL POST ELEGIDO
     const {data, isPending, isError} = useQuery({
@@ -57,11 +58,11 @@ function CommentPost(){
 
                 <Post PostData={obj}/>
 
-                 <div className="d-flex flex-column">
+                <div className="d-flex flex-column">
                     { isError && <DisplayError/> }
                     { isPending && <LoadingSpinner/>}
                     { data?.map(comment => (<Comment key={comment?.idComentario} CommentData={comment}/>)) }
-                 </div>
+                </div>
             </div>
         </div>   
     ) 
