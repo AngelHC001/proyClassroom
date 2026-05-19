@@ -38,7 +38,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
 
             <form className="card-footer border-top-light d-flex gap-2">
                 <button className="btn btn-outline-light border-0 btn-sm"
-                    onClick={(e) => onLike(e,PostData?.idPost)}>
+                    onClick={() => onLike(PostData?.idPost)}>
                      <i className="bi bi-check-circle text-success fs-4"/> {PostData?.likes}
                 </button>
                 
@@ -50,7 +50,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
 
                 {isManageEnabled &&   
                     (<button className="btn btn-outline-light border-0 btn-sm"
-                        onClick={(e) => onDelete(e, PostData?.idPost)}>
+                        onClick={() => onDelete(PostData?.idPost)}>
                          <i className="bi bi-dash-circle text-danger fs-4"/>      
                     </button>)
                 }

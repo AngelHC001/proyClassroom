@@ -30,8 +30,7 @@ function PostArea(){
                 throw new Error('Error al subir el post');
             }
 
-            return response.json(); // Esto es lo que debe retornar la función
-            
+            return response.json(); 
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey:['posts', activeView.type, user?.id]});

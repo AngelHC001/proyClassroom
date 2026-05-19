@@ -13,22 +13,6 @@ import DisplayError from "../components/error_banner"
 const APIURL = import.meta.env.VITE_API_URL;
 
 
-//HANDLE onDelete
-const handleDelete = async(e, postId) => {
-    e.preventDefault();
-    if(!confirm('¿Borrar Publicacion?')){ return; }
-
-    try{
-        await fetch(`${APIURL}/posts/erase_post/${postId}`, { method:'DELETE' });
-    } 
-    catch (error) {
-        console.error(error.message);
-        alert('OCURRIO UN ERROR AL BORRAR');               
-    }
-}
-
-
-
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
 function PostContainer(){
@@ -39,8 +23,9 @@ function PostContainer(){
     const queryClient = useQueryClient();
     
     const label = activeView.type === 'my_posts' ? 'Mis Posts' : 'Actividad';
-    const manageMode = (activeView.type === 'my_posts') || (activeView.type === 'user_posts') ? true : false;
+    const manageMode = (activeView.type === 'my_posts') || (activeView.type === 'manage_posts');
     
+    //FUNCION FETCH
     const { data, isPending, isError} = useQuery({
         queryKey: ['posts', activeView.type, user?.id],
         queryFn: async () => {
@@ -60,7 +45,24 @@ function PostContainer(){
         enabled: !!user?.id
     });
 
+    //FUNCION ON DELETE
+    const MutationDelete = useMutation({
+        mutationFn: async (postId) => {
+            if(!confirm('¿Borrar Publicacion?')){ return; }
 
+            const response = await fetch(`${APIURL}/posts/erase_post/${postId}`, { method: 'DELETE'});
+
+            if(!response.ok){ throw new Error('Error al borrar post');}
+            return response.json();
+        },
+        onSuccess: () => {
+            // Al dar like, solo queremos que se actualicen los contadores
+            queryClient.invalidateQueries({ queryKey: ['posts'] });
+        }
+
+    });
+
+    //FUNCION LIkE
     const MutationLike = useMutation({
         mutationFn: async (postId) => {
             const response = await fetch(`${APIURL}/posts/like_post/${postId}`, 
@@ -109,7 +111,7 @@ function PostContainer(){
                 { data?.map(post => (<Post key={post?.idPost} PostData={post} 
                     isManageEnabled={manageMode} 
                     onLike={() => MutationLike.mutate(post?.idPost)}
-                    onDelete={handleDelete}/>))
+                    onDelete={() => MutationDelete.mutate(post?.idPost)}/>))
                 }
 
                 <div ref={bottomRef}></div>        
