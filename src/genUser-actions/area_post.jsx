@@ -38,7 +38,7 @@ function PostArea(){
             clearFields();
         },
         onError: (error) => {
-            console.error("Error al publicar:", error);
+            console.error("Error al publicar:", error.message);
             setMessage({color: 'danger', text: 'Error Algo salió mal'});
         }
     })

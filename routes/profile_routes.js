@@ -11,7 +11,7 @@ const router = express.Router();
 //MULTER FILE UPLOAD CONFIG 
 const storage = multer.diskStorage({
     destination: (req,file,cb) => {
-        cb(null,'appUserData/');
+        cb(null,'./public/appUserData/');
     },
     filename: (req,file,cb) => {
         const uniqName = Date.now() + "-" + file.originalname;
@@ -31,7 +31,7 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
         return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
     }
 
-    if(!fs.existsSync('appUserData')){
+    if(!fs.existsSync('./public/appUserData')){
         return res.status(400).json('EL DIRECTORIO PARA FOTO DE PERFIL NO EXISTE');
     }
 

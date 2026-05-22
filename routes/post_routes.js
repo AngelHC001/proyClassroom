@@ -17,7 +17,7 @@ const router = express.Router();
 //CONFIGURAR DESTINO Y archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "appUploads/"); // tu carpeta destino
+    cb(null, "./public/appUploads/"); // tu carpeta destino
   },
   filename: (req, file, cb) => {
     const unique = "UploadedImg" + Math.round(Math.random() * 1e9);
@@ -53,12 +53,13 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
     const {remitent ,title, content, mode, postTarget} = req.body;
     const files = req.files?.map((f) => f.filename) ?? [];
     
+   
     //Validacion debe haber al menos uno ocupado
     if((title === '' && content === '') && files.lenght === 0){
         return res.status(400).json({ message: 'No hay nada que publicar' });
     }
 
-    if(!fs.existsSync('appUploads')){
+    if(!fs.existsSync('./public/appUploads')){
         return res.status(400).json('EL DIRECTORIO DE UPLOADS NO EXISTE');
     }
 
