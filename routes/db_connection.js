@@ -6,6 +6,7 @@ const config = {
     user: 'ClassroomTester',
     password: 'classroom$2026',
     database: 'ProyClassroom',
+    timezone: '-06:00',
     port: 1433,
     options:{
         encrypt: false,                 // Set to true if using Azure or SSL

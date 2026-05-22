@@ -40,7 +40,7 @@ const upload = multer({
 //------FECHA HORA-------
 const DATE_SOURCE = new Date();
 function SetDate(){
-    let fecha = `${DATE_SOURCE.getFullYear()}-${DATE_SOURCE.getMonth() + 1}-${DATE_SOURCE.getDate()}`;
+    let fecha = `${DATE_SOURCE.getFullYear()}/${DATE_SOURCE.getMonth() + 1}/${DATE_SOURCE.getDate()}`;
     let hora = `${DATE_SOURCE.getHours()}:${DATE_SOURCE.getMinutes()}`;
     
     return `${fecha} ${hora}`;

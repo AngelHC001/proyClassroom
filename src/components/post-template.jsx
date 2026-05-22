@@ -1,21 +1,27 @@
 import React from "react";
 import { useView } from "./viewContext";
-const APP_PATH = '../appUploads/';
 
-function FileContainer({file}){
-    return(
-        <a href={APP_PATH + file}>
-            <img className="img-fluid rounded" src={APP_PATH + file} width="100" height="100"/>
-        </a>
-    )
-}
+import FileContainer from "./file_container";
+
+const opciones = {
+    timeZone: "America/Mexico_City",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false // formato 24h
+};
 
 
 // En el botón de comentarios dentro de PostContainer
 function Post({PostData, isManageEnabled = false, onLike, onDelete}){
     const {activeView, setActiveView} = useView(); 
     
-    const fecha = new Date(PostData?.fechahora);    
+    const fecha = new Date(PostData?.fechahora);
+    const fechaFormateada = new Intl.DateTimeFormat("es-Mx", opciones).format(fecha);
+    
+
     const fileChain = PostData?.stringfiles.split('-') ?? [];
 
     const handleLikeClick = (e) => {
@@ -34,7 +40,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
         <div className="card border-0 post text-light me-2">
             <div className="card-header border-light d-flex justify-content-between align-items-center">
                 <h3>{PostData?.titulo}</h3>
-                <small>{PostData?.remitente} {fecha.toLocaleString()}</small>
+                <small>{PostData?.remitente} {fechaFormateada}</small>
             </div>
             
             <div className="card-body">

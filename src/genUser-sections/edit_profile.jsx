@@ -177,16 +177,19 @@ function ChangeData({setMessage}){
 
 
 function EditSection(){
-    const [message, setMessage] = useState('Nada');
+    const [message, setMessage] = useState(null);
     
     return(
         <div className="text-light">            
             <SectionHeader title={'Mi Perfil'} iconClass={'person-circle'}/>
             
             <div className="p-3 justify-content-center">
-                <div className="alert alert-info alert-dismissible fade show" role="alert">
-                    {message}
-                </div>
+                {
+                    message && 
+                    <div className="alert alert-info alert-dismissible fade show" role="alert">
+                        {message}
+                    </div>
+                }
 
                 <div className="row">
                     <ChangePic setMessage={setMessage}/>
