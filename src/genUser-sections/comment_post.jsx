@@ -17,6 +17,7 @@ const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes
 function CommentPost(){
     const { user } = useAuth();
     const { activeView, setActiveView } = useView();
+    const remitente = `${user?.matricula}-${user?.nombre}`; 
     
     //CONVERSION A OBJETO
     const values = activeView.postTarget;
@@ -48,22 +49,30 @@ function CommentPost(){
     
     return(
         <div className="container-fluid text-light">
-            <SectionHeader title={'Ver Publicacion'} iconClass={'sticky'}/>
-
-            <div className="p-2 post-space">
-                <button className="btn btn-outline-dark mb-3" 
-                    onClick={() => setActiveView({type: 'feed'})}>
+            <SectionHeader title={'Ver Publicacion'} iconClass={'sticky'}>
+                <button className="btn btn-outline-dark" onClick={() => setActiveView({type: 'feed'})}>
                     <i className="bi bi-arrow-left"/> Volver
                 </button>
-
+            </SectionHeader>
+            
+            <div className="post-space p-3">
                 <Post PostData={obj}/>
 
-                <div className="d-flex flex-column">
+                <div className="d-flex flex-column gap-1">
                     { isError && <DisplayError/> }
                     { isPending && <LoadingSpinner/>}
-                    { data?.map(comment => (<Comment key={comment?.idComentario} CommentData={comment}/>)) }
+                    { 
+                        data?.map(comment => (
+                            <Comment key={comment?.idComentario} 
+                                CommentData={comment} 
+                                isEditable={comment?.remitente === remitente} 
+                                isForManage={comment?.remitente === remitente || user?.tipo === 1}/>
+                        )) 
+                    }
+                    <br/>
                 </div>
             </div>
+
         </div>   
     ) 
 }

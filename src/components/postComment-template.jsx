@@ -1,4 +1,5 @@
 import React from "react";
+import FileContainer from '../components/file_container.jsx';
 
 const opciones = {
     timeZone: "America/Mexico_City",
@@ -10,30 +11,40 @@ const opciones = {
     hour12: false // formato 24h
 };
 
-function Comment({CommentData, isForManage = false}){
-    
-
+function Comment({CommentData, isForManage = false, isEditable = false}){
     const fecha = new Date(CommentData?.fechahora);
     const fechaFormateada = new Intl.DateTimeFormat("es-Mx", opciones).format(fecha);
-    
-    
-    return(
+    const fileChain = CommentData?.stringfiles.split('-') ?? [];
 
-        <div className="rounded p-2 border-bottom bg-dark">
+
+    return(
+        <div className="rounded p-1 comment">
             <div className="d-flex justify-content-between border-bottom">
                 <span>{CommentData?.remitente}</span>
                 <span>{fechaFormateada}</span>
             </div>
             
             <p>{CommentData?.contenido}</p>
-            
+
+            <div className="d-flex flex-row align-items-center justify-content-center gap-2">
+                {
+                    CommentData?.stringfiles && fileChain.map((f,i) => (<FileContainer key={i} file={f}/>)) 
+                }   
+            </div>
+        
             {
-                isForManage && 
-                <button className="p-auto btn btn-outline-danger border-0">
-                    <i className="bi bi-dash-circle"></i>
-                </button>
+               isEditable &&
+                    <button className="btn btn-outline-light border-0 rounded-circle">
+                        <i className="bi bi-pencil"/>
+                    </button>
             }
-           
+ 
+            { 
+                isForManage && 
+                    <button className="btn btn-outline-light border-0 rounded-circle">
+                        <i className="bi bi-dash-circle"/>
+                    </button>   
+            }
         </div>
     )
 }

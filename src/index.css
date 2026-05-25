@@ -34,6 +34,7 @@ input[type="file"] {
     display: none;
 }
 
+
 .post-space{
     height: calc(80dvh - 58px); /* menos el header */
     overflow-y: auto;
