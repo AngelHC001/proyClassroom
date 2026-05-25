@@ -12,7 +12,6 @@ import DisplayError from "../components/error_banner"
 
 const APIURL = import.meta.env.VITE_API_URL;
 
-
 //LISTA TODOS LOS POSTS AJUSTAR SEGUN EL MODO
 //MODOS:  ALL_POSTS, MY_POSTS, USER_POSTS
 function PostContainer(){
