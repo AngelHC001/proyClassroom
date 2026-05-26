@@ -165,14 +165,28 @@ router.get('/like_post/:id', async(req,res) => {
 
 
 //ELIMINAR POSTS (MIAS Y ADMIN)
-router.delete('/erase_post/:id',async(req,res) => {
-    const postTarget = req.params.id;
+router.delete('/erase_post',async(req,res) => {
+    //Consultar idPost y sus archivos
+    const { postTarget, stringTarget } = req.body;
 
     if(!postTarget){
         return res.status(400).json({ message: 'Sin requisitos de consulta' });
     }
 
     try {
+        //TIENE ARCHIVOS
+        if(stringTarget !== ''){
+            let filesTarget = stringTarget.split('-');
+                
+            for (const file of filesTarget) {
+                const filePath = path.resolve('./public/appUploads', file);
+                        
+                //Verificar y borrar
+                await fs.accessSync(filePath);
+                await fs.unlinkSync(filePath)
+            }
+        }
+
         //BORRAR SUS COMENTARIOS
         await pool.request()
             .input('idPost', sql.Int, postTarget)

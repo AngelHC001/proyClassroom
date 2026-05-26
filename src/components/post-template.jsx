@@ -32,7 +32,7 @@ function Post({PostData, isManageEnabled = false, onLike, onDelete}){
     const handleDeleteClick = (e) => {
         e.preventDefault();
         if(confirm('Seguro que quieres borrar este Post?')){
-            onDelete(PostData?.idPost);
+            onDelete([PostData?.idPost, PostData?.stringfiles]);
         }
     }
 

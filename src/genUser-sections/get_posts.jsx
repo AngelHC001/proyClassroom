@@ -46,9 +46,13 @@ function PostContainer(){
 
     //FUNCION ON DELETE
     const MutationDelete = useMutation({
-        mutationFn: async (postId) => {
-            const response = await fetch(`${APIURL}/posts/erase_post/${postId}`, { method: 'DELETE'});
-            if(!response.ok) throw new Error('Error al borrar post (MIS POSTS)'); 
+        mutationFn: async ([postId, stringfiles]) => {
+            const response = await fetch(`${APIURL}/posts/erase_post`, { 
+                method: 'DELETE',
+                headers: {'Content-Type': 'Application/json'},
+                body: JSON.stringify({postTarget: postId, stringTarget: stringfiles})
+            });
+            if(!response.ok) throw new Error('Error al borrar post (POST)'); 
             return response.json();
         },
 
@@ -140,7 +144,7 @@ function PostContainer(){
                 { data?.map(post => (<Post key={post?.idPost} PostData={post} 
                     isManageEnabled={manageMode} 
                     onLike={() => MutationLike.mutate(post?.idPost)}
-                    onDelete={() => MutationDelete.mutate(post?.idPost)}/>))
+                    onDelete={() => MutationDelete.mutate([post?.idPost, post?.stringfiles])}/>))
                 }
 
                 <div ref={bottomRef}></div>        
