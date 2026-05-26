@@ -15,7 +15,7 @@ const DEFAULTIMG = 'user.png';
 router.get('/list_users',async(req,res) => {
     try{
         const result = await pool.query('SELECT IDUSUARIO, NOMBRE, MATRICULA, TIPOUSUARIO' + 
-            ' FROM ALUMNO ORDER BY TIPOUSUARIO DESC');
+            ' FROM ALUMNO ORDER BY TIPOUSUARIO DESC, MATRICULA ASC');
         
         return res.status(200).json(result.recordset)
     }
@@ -123,7 +123,7 @@ router.delete('/erase_files', async(req,res) => {
         //SE ASUME QUE TODOS LOS REQUISITOS YA ESTAN NO SE IGNORA NINGUNO
         let table = mode === 'fromPost' ? 'POST' : 'COMENTARIO';
         let filesTarget = stringTarget.split('-');
-      
+        
         for (const file of filesTarget) {
             const filePath = path.resolve('./public/appUploads', file);
             
