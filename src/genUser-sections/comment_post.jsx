@@ -9,6 +9,8 @@ import Comment from "../components/postComment-template";
 import LoadingSpinner from '../components/loading_spinner'
 import DisplayError from '../components/error_banner'
 
+import NoCommentYet from '../assets/no-comment-yet.webp'; 
+
 const APIURL = import.meta.env.VITE_API_URL; 
 const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
                     "comentarios", "remitente", "idUsuario"];
@@ -61,8 +63,16 @@ function CommentPost(){
                 <div className="d-flex flex-column gap-1">
                     { isError && <DisplayError/> }
                     { isPending && <LoadingSpinner/>}
+
+                    { data?.length === 0 && 
+                            <div className="text-center p-3">
+                                <img className="img-fluid rounded" src={NoCommentYet} width={80} height={80} alt="Sin datos"/>
+                                <h3>Inicia la Conversacion!</h3>
+                            </div>
+                    }
+
                     { 
-                        data?.map(comment => (
+                        data?.length > 0 && data?.map(comment => (
                             <Comment key={comment?.idComentario} 
                                 CommentData={comment} 
                                 isEditable={comment?.remitente === remitente} 

@@ -5,20 +5,24 @@ function Modal({filename}){
     return(
         <div className="modal fade" id={'modalShow'+filename} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div className="modal-dialog">
-                <div className="modal-content bg-success border-0">
+                <div className="modal-content right-side border-0">
+                    <div className="modal-header">
+                        <h5 className="text-light">Archivos Enviados</h5>
+                    </div>
+
                     <div className="modal-body text-center">
                         <img className="img-fluid rounded" src={APP_PATH + filename} 
-                            width="200" height="200"/>
+                            width="300" height="300"/>
                     </div>
                     
                     <div className="modal-footer">
                         <span className="text-light">{filename}</span>
 
-                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                        <button type="button" className="btn btn-outline-light border-0 rounded-circle" data-bs-dismiss="modal">
                             <i className="bi bi-x" />
                         </button>
                     
-                        <a className="btn right-side" href={APP_PATH + filename} download={APP_PATH + filename}>
+                        <a className="btn btn-outline-light border-0 rounded-circle" href={APP_PATH + filename} download={APP_PATH + filename}>
                             <i className="bi bi-download"/>    
                         </a>
                         

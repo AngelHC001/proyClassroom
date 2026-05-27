@@ -22,12 +22,6 @@ const db_items = [
         piece: 'my_profile'
     },
     {
-        key: 'admin_item2',
-        icon: 'bi bi-sticky-fill',
-        sectionName: 'Mis Posts',
-        piece: 'my_posts'
-    },
-    {
         key: 'admin_item3',
         icon: 'bi bi-stickies-fill',
         sectionName: 'Post de Alumnos',
@@ -44,7 +38,8 @@ const db_items = [
 
 
 function AdminLeftBar(){
-    const { setActiveView } = useView();
+    const { activeView, setActiveView } = useView();
+    
 
     return(
         <div className="col-md-4 left-side text-center p-3">
@@ -54,7 +49,7 @@ function AdminLeftBar(){
             <div className="d-flex flex-column gap-2">
                 {
                     db_items?.map((x) => (
-                        <button key={x.key} className="btn btn-outline-dark" 
+                        <button key={x.key} className={`btn ${x.piece === activeView.type ? 'btn-dark': 'btn-outline-dark'}`} 
                             onClick={() => setActiveView({type: x.piece})}>  
                             <i className={x.icon}></i> {x.sectionName}
                         </button> 
@@ -88,7 +83,6 @@ function AdminRightBar(){
             {activeView.type === 'users_control' &&  <AdminControl refreshKey={refreshKey} 
                                                 onRefresh={() => setRefreshKey(k =>  k + 1)}/>}
             {activeView.type === 'my_profile' && <EditSection/>}
-            {activeView.type === 'my_posts' && <PostContainer/>}
             {activeView.type === 'manage_posts' && <PostContainer/>}
             {activeView.type === 'manage_files' && <AdminFiles/>} 
         </div>

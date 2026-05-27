@@ -8,6 +8,7 @@ import { useView } from "../components/viewContext";
 import SectionHeader from "../components/section-header";
 import DisplayError from "../components/error_banner";
 import LoadingSpinner from "../components/loading_spinner";
+import NoDataYet from '../assets/no-data-yet.webp';
 
 const APP_FOLDER = './appUploads/';
 const API_URL = import.meta.env.VITE_API_URL;
@@ -17,6 +18,7 @@ function FileContainer({filesData}){
     const { activeView } = useView();
     const queryClient = useQueryClient(); 
 
+    const filechain = filesData?.STRINGFILES.split('-');
     //MODES - FROMPOST/FROMCOMMENT
 
     const deleteFileMutation = useMutation({
@@ -42,14 +44,13 @@ function FileContainer({filesData}){
     return(
        <div className="col">
             <div className="card left-side border-0">
-                <div className="card-header">
-                    <img className="card-img-top"/>
-                    ***collage            
-                </div>
-
+                <img className="card-img-top img-fluid rounded" 
+                    src={`${APP_FOLDER}/${filechain[0]}`} width={50} height={50}/> 
+                
                 <ul className="list-group list-group-flush text-center">
-                    <li className="list-group-item">{filesData?.TITULO}</li>
-                    <li className="list-group-item">{filesData?.REMITENTE}</li>
+                    <li className="list-group-item">{filechain.length} Imagen(es)</li>
+                    <li className="list-group-item">Post: {filesData?.TITULO}</li>
+                    <li className="list-group-item">De: {filesData?.REMITENTE}</li>
                     <li className="list-group-item">{filesData?.FECHAHORA}</li>
                 </ul>
                             
@@ -58,8 +59,8 @@ function FileContainer({filesData}){
                         <i className="bi bi-download"/>
                     </a>
                             
-                    <button className="btn btn-danger" 
-                        onClick={() => deleteFileMutation.mutate([filesData?.IDPOST, filesData?.STRINGFILES])}>
+                    <button className="btn btn-danger" onClick={() => 
+                        deleteFileMutation.mutate([filesData?.IDPOST, filesData?.STRINGFILES])}>
                         <i className="bi bi-trash-fill"/>
                     </button>                
                 </div>
@@ -73,13 +74,7 @@ function FileContainer({filesData}){
 function AdminFiles(){
     const { user } = useAuth();
     const { activeView } = useView();
-    
-    //RECIBIR JSON DE FILE-STRINGS
-    //POR MODO: POSTS, COMMENTS?
-
-    //fetch files en mode
-    //0 post
-    //1 comments
+        
     const mode = 0;
 
     const { data, isPending, isError } = useQuery({
@@ -104,16 +99,20 @@ function AdminFiles(){
     return(
         <div className="text-light">
             <SectionHeader title={'Archivos Enviados'} iconClass={'file-zip-fill'}/>
-             <div className="g-2 p-2">
-                <button className="btn btn-dark">Por Posts</button>
-                <button className="btn btn-dark">Por Comentarios</button>
-            </div>
 
             <div className="post-space row row-cols-1 row-cols-3 g-2 p-2 z-2">
                 {isError && <DisplayError/>}
                 {isPending && <LoadingSpinner/>}
                 
-                { data?.map((filePack) => (
+                { data?.length === 0 && 
+                    <div className="text-center">
+                        <img className="img-fluid" src={NoDataYet} width={80} height={80} alt="Sin datos"/>
+                        <h3>Nadie subio nada todavia...</h3>
+                    </div>
+                }
+
+                { data?.length > 0 && 
+                    data?.map((filePack) => (
                         <FileContainer key={filePack?.IDPOST} filesData={filePack}/>       
                     )) 
                 }  
