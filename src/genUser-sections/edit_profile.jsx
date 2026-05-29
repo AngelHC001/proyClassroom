@@ -54,7 +54,7 @@ function ChangePic({setMessage}){
     return(
         <div className="col-md-6 border-light border-end border-3 text-center">
             <h1>{user?.nombre}</h1>      
-            <img className="img-fluid rounded mb-3" src={IMGPATH + user?.imgPerfil} width="120" height="120"/>
+            <img className="img-fluid rounded mb-3" src={IMGPATH + user?.imgPerfil} width="220" height="220"/>
             
             {newImg && (<small className="row">{newImg.name}</small>)}
             
@@ -73,7 +73,9 @@ function ChangePic({setMessage}){
                     <small><i className="bi bi-floppy"> </i>Guardar</small>
                 </button>
             </form>
-            <small><i className="bi bi-info-circle"/> Elige una foto y pulsa Guardar.</small>              
+            <small><i className="bi bi-info-circle"/> Elige una foto y pulsa Guardar.</small>   
+            <br/>
+            <br/>           
         </div>
     )
 }

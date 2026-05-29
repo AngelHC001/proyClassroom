@@ -205,4 +205,39 @@ router.delete('/erase_post',async(req,res) => {
 });
 
 
+//EDITAR POST
+
+
+router.put('/update_post', async(req,res) => {
+    const { newTitle, newContent, idPost, idUser } = req.body;
+
+    if(!idPost || !idUser){
+        return res.status(400).json({ message: 'Sin requisitos de consulta' });
+    }
+
+    try {
+
+        await pool.request()
+            .input('titulo', sql.NVarChar, newTitle)
+            .input('contenido', sql.NVarChar, newContent)
+            .input('idPost', sql.Int, idPost)
+            .input('idUsuario', sql.Int, idUser)
+            .query('UPDATE POST SET TITULO = @titulo, CONTENIDO = @contenido WHERE ' + 
+                'IDPOST = @idPost AND IDUSUARIO = @idUsuario')
+
+        return res.status(200).json({message: 'Post Eliminado'}); 
+    } catch (error) {
+        console.error('Error al actualizar el Post', error);
+        res.status(500).json({message: 'Error interno del servidor (UpdatePost)'}); 
+    }
+
+    
+
+
+
+});
+
+
+
+
 export default router;
