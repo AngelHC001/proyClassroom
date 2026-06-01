@@ -56,7 +56,7 @@ function Post({PostData}){
     // Mutaciones limpias desde el Hook
     const { updateMutation, likeMutation, deleteMutation } = usePostMutations(PostData);
 
-    //ajustes FRONT END
+    //Ajustes FRONT END
     const fecha = new Date(PostData?.fechahora);
     const fechaFormateada = new Intl.DateTimeFormat("es-Mx", opciones).format(fecha);
     const isManageEnabled = (activeView.type === 'my_posts') || (activeView.type === 'manage_posts');
@@ -128,7 +128,6 @@ function Post({PostData}){
                 { isManageEnabled &&  
                     <DeleteButton onClick={() => deleteMutation.mutate([PostData?.idPost, PostData?.stringfiles])}/>      
                 }
-            
             </div>
         </div>
     )

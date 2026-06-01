@@ -11,6 +11,27 @@ export function usePostMutations(PostData){
 
     const queryKey = ['posts', activeView.type, user?.id];
 
+    //MUTACION POST
+    const postMutation = useMutation({
+        mutationFn: async (postData) => {
+            const response = await fetch(`${APIURL}/posts/upload_post`,{
+                method:'POST',
+                body: postData
+            })
+            
+            if (!response.ok) throw new Error('Error al subir el post');
+            return response.json(); 
+        },
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey });
+        },
+        onError: (error) => {
+            console.error("Error al publicar:", error.message); 
+        }
+    })
+
+
     //MUTACION EDITAR
     const updateMutation = useMutation({
         mutationFn: async(postChanges) => {
@@ -106,5 +127,5 @@ export function usePostMutations(PostData){
         }
     });
     
-    return { updateMutation, likeMutation, deleteMutation }
+    return { postMutation, updateMutation, likeMutation, deleteMutation }
 }

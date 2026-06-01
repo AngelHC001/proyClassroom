@@ -1,48 +1,23 @@
 import React from "react";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { usePostMutations } from "./usePostMutations";
 
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
-const APIURL = import.meta.env.VITE_API_URL;
 
 
 function PostArea(){
     const { user } = useAuth();
     const { activeView } = useView();
-    const queryClient = useQueryClient();
+    const { postMutation } = usePostMutations();
 
     const [message, setMessage] = useState({color:'secondary', text:''});
     const [postData,setpostData] = useState({remitent: user, title:'',content:''});
     const [selectedFiles, setSelectedFiles] = useState([]);
     const MAX = 5;
 
-    //MUTATION RELOAD
-    const mutation = useMutation({
-        mutationFn: async (postData) => {
-            const response = await fetch(`${APIURL}/posts/upload_post`,{
-                method:'POST',
-                body: postData
-            })
-            
-            if (!response.ok) {
-                throw new Error('Error al subir el post');
-            }
-
-            return response.json(); 
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey:['posts', activeView.type, user?.id]});
-            setMessage({color: 'success', text: 'Publicado'});
-            clearFields();
-        },
-        onError: (error) => {
-            console.error("Error al publicar:", error.message);
-            setMessage({color: 'danger', text: 'Error Algo salió mal'});
-        }
-    })
-
+    const lockEmptyPost = postData.title === '' && postData.content === '';
+  
     const handleChange = (e) => {
         const {name,value} = e.target;
         setpostData((prev) => ({
@@ -59,7 +34,6 @@ function PostArea(){
             // Evitar duplicados por nombre
             const existing = new Set(prev.map(f => f.name));
             const nuevos = filesPack.filter(f => !existing.has(f.name));
-        
             // Acumular y respetar el límite MAX
             return [...prev, ...nuevos].slice(0, MAX);
         });
@@ -71,31 +45,53 @@ function PostArea(){
         document.getElementById('input-file').value = '';
     }
 
+    const createPostPayload = (postData) => ({
+        title: postData.title,
+        content: postData.content,
+        remitent: JSON.stringify(postData.remitent),
+        mode: 'feed'
+    });
+
+    const createCommentPayload = (postData, targetId) => ({
+        postTarget: targetId,
+        content: postData.content,
+        remitent: JSON.stringify(postData.remitent),
+        mode: 'comment'
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const isComment = activeView.type === 'comment';
+
+        if((isComment && postData.content === '') || (activeView.type === 'feed' && lockEmptyPost)){
+            setMessage({color: 'secondary', text: 'No hay nada'});
+            return;
+        }
+
+        const payload = isComment ? createCommentPayload(postData, activeView?.postTarget[0]):
+                                    createPostPayload(postData);
+        
+        //Rellenar formData
         const formData = new FormData();
-        
-        if(activeView.type === 'feed'){
-            formData.append('title',postData.title);
-        }
-        
-        if(activeView.type === 'comment'){
-            console.log(activeView.postTarget);
-            formData.append('postTarget', activeView?.postTarget[0]);
-        }
-        
-        formData.append('mode', activeView.type);
-        formData.append('content', postData.content); 
-        formData.append('remitent', JSON.stringify(postData.remitent));
-       
-        //FILES
-        selectedFiles.forEach((file) => {
-            formData.append('images', file);
+
+        Object.entries(payload).forEach(([key,value]) => {
+            if(value !== undefined) formData.append(key,value)
         });
 
-        //HACER REQUEST
-        mutation.mutate(formData);
+        //FILES
+        selectedFiles.forEach((file) => { formData.append('images', file); });
+
+        //REQUEST
+        try {
+            postMutation.mutateAsync(formData);
+            clearFields();       
+            setMessage({color: 'success', text: 'Publicado'});
+        } catch (error) {
+            console.error(error.message);
+            setMessage({color: 'danger', text: 'Error Algo salió mal'});
+        }
     }
+
 
     return(
         <div className="p-2">
@@ -103,16 +99,15 @@ function PostArea(){
                 <h4>{activeView.type === 'comment' ? 'Comentar' : 'Publicar'}</h4>
                 {
                     message.text && 
-                        <div className={`alert alert-${message.color}`} 
-                        role="alert">{message.text}</div>
+                        <div className={`alert alert-${message.color}`} role="alert">{message.text}</div>
                 }
             </div>
            
             <form className="d-flex flex-column gap-2" encType="multipart/form-data" onSubmit={handleSubmit}>
                 {
-                    activeView.type === 'comment' ? '' : 
-                    <input className="form-control" name="title" type="text" placeholder="Titulo"
-                    value={postData.title} onChange={handleChange} />
+                    activeView.type === 'feed' &&  
+                        <input className="form-control" name="title" type="text" placeholder="Titulo"
+                        value={postData.title} onChange={handleChange} />
                 }
                 
                 <textarea className="form-control" name="content" placeholder="Escribe algo..."

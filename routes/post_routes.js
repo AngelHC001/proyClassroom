@@ -50,7 +50,7 @@ function SetDate(){
 //PUBLICAR INSERT Y DELETE
 router.post('/upload_post', upload.array('images',5), async(req,res) => {
     //Recibe datos
-    const {remitent ,title, content, mode, postTarget} = req.body;
+    const { title, content, remitent, mode, postTarget} = req.body;
     const files = req.files?.map((f) => f.filename) ?? [];
     
    
