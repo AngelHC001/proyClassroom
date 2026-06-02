@@ -27,6 +27,33 @@ router.get('/fetch_comment/:id', async(req,res) => {
     }
 });
 
+//EDITAR COMENTARIOS
+router.put('/edit_comment', async(req,res)=>{
+    const { newContent, commentTarget, postOrigin, idUser} = req.body;
+    
+    if(!postOrigin || !commentTarget){
+        return res.status(400).json({ message: 'Sin requisitos de consulta (COMENTARIOS)' });
+    }
+
+    try {
+        await pool.request()
+            .input('idComentario', sql.Int, commentTarget)
+            .input('contenido', sql.NVarChar, newContent)
+            .input('idPost', sql.Int, postOrigin)    
+            .input('idUsuario', sql.Int, idUser)
+            .query(`UPDATE COMENTARIO 
+                        SET CONTENIDO = @contenido WHERE 
+                            IDCOMENTARIO = @idComentario 
+                            AND IDUSUARIO = @idUsuario
+                            AND IDPOST = @idPost`);
+
+        return res.status(200).json({message: 'Comentario Editado'});
+    } catch (error) {
+        console.error('Algo salio mal al cargar (EDITAR COMENTARIO)', error);
+        res.status(500).json({message: 'Error interno del servidor (EDITAR COMENTARIO)'}); 
+    }
+});
+
 
 //ELIMINAR COMENTARIOS (MIAS Y ADMIN)
 router.delete('/erase_comment',async(req,res) => {

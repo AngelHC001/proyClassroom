@@ -15,11 +15,9 @@ const APIURL = import.meta.env.VITE_API_URL;
 const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
                     "comentarios", "remitente", "idUsuario"];
     
-
 function CommentPost(){
     const { user } = useAuth();
     const { activeView, setActiveView } = useView();
-    const remitente = `${user?.matricula}-${user?.nombre}`; 
     
     //CONVERSION A OBJETO
     const values = activeView.postTarget;
@@ -65,19 +63,15 @@ function CommentPost(){
                     { isPending && <LoadingSpinner/>}
 
                     { data?.length === 0 && 
-                            <div className="text-center p-3">
+                            (<div className="text-center p-3">
                                 <img className="img-fluid rounded" src={NoCommentYet} width={80} height={80} alt="Sin datos"/>
                                 <h3>Inicia la Conversacion!</h3>
-                            </div>
+                            </div>)
                     }
 
                     { 
                         data?.length > 0 && data?.map(comment => (
-                            <Comment key={comment?.idComentario} 
-                                CommentData={comment} 
-                                isEditable={comment?.remitente === remitente} 
-                                isForManage={comment?.remitente === remitente || user?.tipo === 1}/>
-                        )) 
+                            <Comment key={comment?.idComentario} CommentData={comment}/> )) 
                     }
                     <br/>
                 </div>
