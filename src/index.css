@@ -5,6 +5,8 @@ html, body {
     overflow: hidden;
 }
 
+
+
 #root {
     height: 100%;
     overflow: hidden;
@@ -60,9 +62,6 @@ input[type="file"] {
 .post-space::-webkit-scrollbar-thumb:hover {
     background: #555; /* Handle hover color */
 }
-
-
-
 
 @media (max-width: 768px) {
   html, body {

@@ -83,31 +83,33 @@ function Post({PostData}){
             <div className="card-header border-light d-flex justify-content-between align-items-center">
                 { 
                     isOnEdit ? 
-                        <div className="col-sm">
+                        <div className="col-sm-6">
                             <input className="form-control" type="text" name="newTitle"
                                 onChange={handleChange} value={editData.newTitle}/>  
                         </div>
-                        : <h3>{PostData?.titulo}</h3>
+                        : <h3 className="col-sm-6">{PostData?.titulo}</h3>
                 }
               
-                <div>{PostData?.remitente} {fechaFormateada}</div>
+                <div className="row col-sm-4 text-center">
+                    <span className="mb-1"><b>{PostData?.remitente}</b></span>
+                    <span className="border-top mt-1">{fechaFormateada}</span>
+                </div>
             </div>
             
             <div className="card-body">
                 {
-                    isOnEdit ? 
+                   isOnEdit ? 
                         <textarea className="form-control" name="newContent" 
                            onChange={handleChange} value={editData.newContent}/> 
                         :
                         <p>{PostData?.contenido}</p>
                 }
 
-                <div className="d-flex flex-row align-items-center justify-content-center gap-2">
-                    {
-                        PostData?.stringfiles !== '' && 
-                            fileChain.map((f,i) => (<FileContainer key={i} file={f}/>)) 
-                    }   
-                </div>
+                {  PostData?.stringfiles && 
+                        (<div className="d-flex flex-row align-items-center justify-content-center gap-2">
+                             { fileChain.map((f,i) => (<FileContainer key={i} file={f}/>)) }   
+                        </div>)
+                }
             </div>
 
             <div className="card-footer border-top-light d-flex gap-2">
@@ -120,8 +122,7 @@ function Post({PostData}){
                         postTarget: Object.values(PostData)}) }/>
              
                 { isMyPost && <EditToggleButton isOnEdit={isOnEdit} 
-                                    onClick={() => setIsOnEdit(!isOnEdit)}/>     
-                }
+                                    onClick={() => setIsOnEdit(!isOnEdit)}/> }
 
                 { isOnEdit && <SaveButton onClick={handleUpdateClick}/> }
 

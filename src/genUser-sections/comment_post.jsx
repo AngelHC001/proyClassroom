@@ -50,15 +50,17 @@ function CommentPost(){
     return(
         <div className="container-fluid text-light">
             <SectionHeader title={'Ver Publicacion'} iconClass={'sticky'}>
-                <button className="btn btn-outline-dark" onClick={() => setActiveView({type: 'feed'})}>
+                <button className="btn btn-outline-light border-0 btn-user" 
+                    onClick={() => setActiveView({type: 'feed'})}>
                     <i className="bi bi-arrow-left"/> Volver
                 </button>
             </SectionHeader>
             
             <div className="post-space p-3">
                 <Post PostData={obj}/>
+                <br/>
 
-                <div className="d-flex flex-column gap-1">
+                <div className="d-flex flex-column gap-1 mx-3">
                     { isError && <DisplayError/> }
                     { isPending && <LoadingSpinner/>}
 

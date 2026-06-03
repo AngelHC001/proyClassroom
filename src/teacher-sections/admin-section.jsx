@@ -76,12 +76,9 @@ function AdminLeftBar(){
 
 function AdminRightBar(){
     const { activeView } = useContext(ViewContext);
-    const [refreshKey,setRefreshKey] = useState(0);
     return(
-
         <div className="col-md-8 right-side">
-            {activeView.type === 'users_control' &&  <AdminControl refreshKey={refreshKey} 
-                                                onRefresh={() => setRefreshKey(k =>  k + 1)}/>}
+            {activeView.type === 'users_control' &&  <AdminControl/>}
             {activeView.type === 'my_profile' && <EditSection/>}
             {activeView.type === 'manage_posts' && <PostContainer/>}
             {activeView.type === 'manage_files' && <AdminFiles/>} 

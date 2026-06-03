@@ -15,14 +15,18 @@
 }
 
 .btn-admin{
-    border-color: rgb(192, 90, 79);
     background-color: salmon;
 }
 
+.btn-user{
+    background-color: rgb(149, 228, 80);
+}
+
+
 .post{
-    background-color: rgb(156, 209, 103);
+    background-color: rgb(140, 206, 112);
 }
 
 .comment{
-    background-color: salmon;
+    background-color: rgb(248, 138, 95);
 }

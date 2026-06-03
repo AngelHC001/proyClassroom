@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { usePostMutations } from "./usePostMutations";
 
+import { usePostMutations } from "./usePostMutations";
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
 
@@ -16,7 +16,8 @@ function PostArea(){
     const [selectedFiles, setSelectedFiles] = useState([]);
     const MAX = 5;
 
-    const lockEmptyPost = postData.title === '' && postData.content === '';
+    const lockEmptyPost = activeView.type === 'feed' && (postData.title === '' && postData.content === '');
+    const lockEmptyComment = activeView.type === 'comment' && postData.content === '';
   
     const handleChange = (e) => {
         const {name,value} = e.target;
@@ -85,7 +86,6 @@ function PostArea(){
         try {
             postMutation.mutateAsync(formData);
             clearFields();       
-            setMessage({color: 'success', text: 'Publicado'});
         } catch (error) {
             console.error(error.message);
             setMessage({color: 'danger', text: 'Error Algo salió mal'});
@@ -114,19 +114,20 @@ function PostArea(){
                 value={postData.content} onChange={handleChange}/> 
                 
                 <div className="d-flex flex-row gap-3"> 
-                    <label className="btn btn-outline-dark">
-                        <i className="bi bi-paperclip"></i>    
+                    <label className="btn btn-outline-dark border-0 rounded-circle" title="Adjuntar Imagenes">
+                        <i className="bi bi-file-image-fill fs-5"/>    
                         <input id="input-file" name="selectedFiles" type="file" multiple accept="image/*" 
-                         disabled={selectedFiles.length >= MAX} onChange={handleFiles} title="Adjuntar Imagenes"/>
+                         disabled={selectedFiles.length >= MAX} onChange={handleFiles}/>
                     </label>
                     
-                    <button className="btn btn-outline-danger" type="button" title="Deshacer mensaje"
+                    <button className="btn btn-outline-danger border-0" type="button" title="Cancelar"
                     onClick={clearFields}>
-                        <i className="bi bi-x-square"></i> 
+                        <i className="bi bi-x-circle fs-5"/>
                     </button>
                             
-                    <button className="btn btn-outline-primary" type="submit" title="Enviar">
-                        <i className="bi bi-send"></i>
+                    <button className="btn btn-outline-primary border-0 rounded-circle" 
+                        type="submit" title="Publicar" disabled={lockEmptyPost || lockEmptyComment}>
+                        <i className="bi bi-send fs-5"/>
                     </button>
                 </div> 
 
@@ -134,7 +135,8 @@ function PostArea(){
                     selectedFiles.length > 0 && 
                     (<span>
                         <i className="bi bi-image-fill"/> {selectedFiles.length}/{MAX}
-                        <ul>{selectedFiles.map((file,i) => (
+                        <ul>
+                            {selectedFiles.map((file,i) => (
                                 <li key={i}>{file.name}</li>))}
                         </ul>
                     </span>)

@@ -6,6 +6,11 @@ import { useView } from "../components/viewContext";
 const IMGPATH = '../appUserData/';
 
 
+
+
+
+
+
 function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
     const { activeView, setActiveView } = useView(); //CONTEXTO DE COMPONENTE RIGHT SIDE
@@ -20,6 +25,37 @@ function ProfileArea(){
         navigate("/login");
     }
 
+    const buttons = [
+        user?.tipo === 1 && {
+            key: 'admin',
+            className: 'btn btn-outline-light btn-admin border-0',
+            label: 'Ver Grupo',
+            icon: 'bi bi-journal-check',
+            callback: () => navigate('/admin-section')
+        },
+        {
+            key: 'posts',
+            className: 'btn btn-outline-light btn-admin border-0',
+            label: btnLabel,
+            icon: 'bi bi-stickies-fill',
+            callback: () => setActiveView(activeView.type === 'my_posts' ? {type : 'feed'} : {type : 'my_posts'})
+        },
+        {
+            key: 'profile',
+            className: 'btn btn-outline-light btn-user border-0',
+            label: btnLabel2,
+            icon: 'bi bi-person-fill',
+            callback: () => setActiveView(activeView.type === 'my_profile' ? {type : 'feed'} : {type:'my_profile'})
+        },
+        {
+            key: 'logout',
+            className: 'btn btn-dark border-0',
+            label: 'Cerrar Sesion',
+            icon: 'bi bi-box-arrow-left',
+            callback: handleLogout
+        }
+    ].filter(Boolean);
+
     return(
         <div className="row text-center p-2">   
             <div className="col border-dark border-end">
@@ -29,26 +65,11 @@ function ProfileArea(){
             </div>
 
             <div className="col d-flex flex-column gap-2 mt-3">
-                {  
-                    user?.tipo === 1 && 
-                        (<Link className="btn btn-outline-light btn-admin" to="/admin-section">
-                            <i className="bi bi-journal-check"/> Administrar
-                        </Link>)  
-                }
-                
-                <button className="btn btn-outline-light btn-admin" onClick={() => 
-                    setActiveView(activeView.type === 'my_posts' ? {type : 'feed'} : {type : 'my_posts'} )}>
-                    <i className="bi bi-stickies-fill"></i> {btnLabel}
-                </button>
-
-                <button className="btn btn-success" onClick={() => 
-                    setActiveView(activeView.type === 'my_profile' ? {type : 'feed'} : {type:'my_profile'})}>
-                    <i className="bi bi-person-fill"></i> {btnLabel2}
-                </button>
-            
-                <button className="btn btn-dark" onClick={handleLogout}>
-                    <i className="bi bi-box-arrow-left"></i> Cerrar Sesion
-                </button>
+                {buttons.map(b => (
+                    <button key={b.key} className={b.className} onClick={b.callback}>
+                        <i className={b.icon}></i> {b.label}
+                    </button>
+                ))}
             </div>      
         </div>    
     )

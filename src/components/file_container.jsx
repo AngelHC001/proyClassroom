@@ -12,7 +12,7 @@ function Modal({filename}){
 
                     <div className="modal-body text-center">
                         <img className="img-fluid rounded" src={APP_PATH + filename} 
-                            width="300" height="300"/>
+                            width={200} height={200}/>
                     </div>
                     
                     <div className="modal-footer">
@@ -37,7 +37,7 @@ export default function FileContainer({file}){
     return(
         <div>
             <button type="button" className="btn border-0" data-bs-toggle="modal" data-bs-target={'#modalShow'+file}>
-                <img className="img-fluid rounded" src={APP_PATH + file} width="100" height="100"/>
+                <img className="img-fluid rounded" src={APP_PATH + file} width={120} height={120}/>
             </button>
 
             <Modal filename={file}/>

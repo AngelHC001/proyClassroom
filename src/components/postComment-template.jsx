@@ -50,26 +50,28 @@ function Comment({CommentData}){
     }
 
     return(
-        <div className="rounded p-1 comment">
+        <div className="rounded p-2 comment">
             <div className="d-flex justify-content-between border-bottom">
-                <span>{CommentData?.remitente}</span>
+                <span><b>{CommentData?.remitente}</b></span>
                 <span>{fechaFormateada}</span>
             </div>
             
             {
                 isOnEdit ? 
                     (<div className="p-2">
-                         <textarea className="form-control" name="newContent" value={editData.newContent} 
-                         onChange={handleChange}/>
+                         <textarea className="form-control" name="newContent" 
+                            value={editData.newContent} onChange={handleChange}/>
                     </div>) 
                     : 
                     (<p>{CommentData?.contenido}</p>)
             }
 
-            <div className="d-flex flex-row align-items-center justify-content-center gap-2">
-                { CommentData?.stringfiles && 
-                        fileChain.map((f,i) => (<FileContainer key={i} file={f}/>)) }   
-            </div>
+            {
+                CommentData?.stringfiles && 
+                    (<div className="d-flex flex-row align-items-center justify-content-center gap-2">
+                        { fileChain.map((f,i) => (<FileContainer key={i} file={f}/>)) }
+                    </div>)
+            }
                 
             { isMyComment && <EditToggleButton isOnEdit={isOnEdit} 
                                     onClick={() => setIsOnEdit(!isOnEdit)}/> }
