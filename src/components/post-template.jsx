@@ -11,7 +11,7 @@ const opciones = {
 };
 
 //AREA DE BOTONES
-const class_button = "btn btn-outline-light btn-sm border-0"
+const class_button = "btn btn-outline-light btn-sm border-0 rounded-circle"
 
 //Like
 const LikeButton = ({ likes, onClick }) => (
@@ -30,14 +30,14 @@ const CommentButton = ({ comentarios, disabled, onClick }) => (
 // Botón para Activar/Desactivar Edición
 const EditToggleButton = ({ isOnEdit, onClick }) => (
     <button className={class_button} onClick={onClick}>
-        <i className={`text-primary fs-4 bi ${isOnEdit ? 'bi-x' : 'bi-pencil-fill'}`}/>      
+        <i className={`fs-4 bi ${isOnEdit ? 'bi-x' : 'bi-pencil-square'}`}/>      
     </button>
 );
 
 // Botón para Confirmar la Edición (Enviar)
-const SaveButton = ({ onClick }) => (
-    <button className={class_button} onClick={onClick}>
-        <i className="text-dark fs-4 bi bi-send-check"/>      
+const SaveButton = ({ onClick, onDisabled }) => (
+    <button className={class_button} onClick={onClick} disabled={onDisabled}>
+        <i className="text-primary fs-4 bi bi-send-check"/>      
     </button>
 );
 
@@ -59,13 +59,16 @@ function Post({PostData}){
     //Ajustes FRONT END
     const fecha = new Date(PostData?.fechahora);
     const fechaFormateada = new Intl.DateTimeFormat("es-Mx", opciones).format(fecha);
-    const isManageEnabled = (activeView.type === 'my_posts') || (activeView.type === 'manage_posts');
     const isMyPost = activeView.type === 'my_posts';
+    const isManageEnabled = isMyPost || (activeView.type === 'manage_posts');
+    
     const fileChain = PostData?.stringfiles.split('-') ?? [];
 
     //EDITAR POST
     const [isOnEdit, setIsOnEdit] = useState(false)
     const [editData, setEditData] = useState({newTitle: PostData?.titulo, newContent: PostData?.contenido});
+    const postHasChanges = (editData.titulo === PostData?.titulo) && (editData.newContent === PostData?.contenido);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -124,7 +127,7 @@ function Post({PostData}){
                 { isMyPost && <EditToggleButton isOnEdit={isOnEdit} 
                                     onClick={() => setIsOnEdit(!isOnEdit)}/> }
 
-                { isOnEdit && <SaveButton onClick={handleUpdateClick}/> }
+                { isOnEdit && <SaveButton onClick={handleUpdateClick} onDisabled={postHasChanges}/> }
 
                 { isManageEnabled &&  
                     <DeleteButton onClick={() => deleteMutation.mutate([PostData?.idPost, PostData?.stringfiles])}/>      

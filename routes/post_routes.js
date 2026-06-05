@@ -37,25 +37,14 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB por archivo
 });
 
-//------FECHA HORA-------
-const DATE_SOURCE = new Date();
-function SetDate(){
-    let fecha = `${DATE_SOURCE.getFullYear()}/${DATE_SOURCE.getMonth() + 1}/${DATE_SOURCE.getDate()}`;
-    let hora = `${DATE_SOURCE.getHours()}:${DATE_SOURCE.getMinutes()}`;
-    
-    return `${fecha} ${hora}`;
-}
-
-
 //PUBLICAR INSERT Y DELETE
 router.post('/upload_post', upload.array('images',5), async(req,res) => {
     //Recibe datos
     const { title, content, remitent, mode, postTarget} = req.body;
     const files = req.files?.map((f) => f.filename) ?? [];
     
-   
     //Validacion debe haber al menos uno ocupado
-    if((title === '' && content === '') && files.lenght === 0){
+    if(title === '' && content === '' && files.length === 0){
         return res.status(400).json({ message: 'No hay nada que publicar' });
     }
 
@@ -64,22 +53,20 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
     }
 
     try {
-        const today = SetDate(); 
         const parsedUser = JSON.parse(remitent);
-
         const chained = files.join('-');
+        const now = new Date(); 
 
         if(mode === 'feed'){
             //PROCESO NORMAL DE POSTS    
             await pool.request()
                 .input('titulo',sql.NVarChar,title)
-                .input('contenido', sql.NVarChar,content)
-                .input('fechahora',sql.DateTime,today)
+                .input('contenido', sql.Text,content)
+                .input('fechahora',sql.DateTime,now)
                 .input('stringfiles',sql.NVarChar,chained)
-                .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
                 .input('idUsuario',sql.Int,parsedUser.id)
-                .query('INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO)' +
-                    ' VALUES (@titulo, @contenido, @fechahora, @stringfiles, @remitente, @idUsuario)');  
+                .query(`INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,IDUSUARIO)
+                         VALUES (@titulo, @contenido, @fechahora, @stringfiles, @idUsuario)`);  
         }
         else if(mode === 'comment')
         {      
@@ -89,14 +76,13 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
             }
 
             await pool.request()
-                .input('contenido', sql.NVarChar,content)
-                .input('fechahora',sql.DateTime,today)
+                .input('contenido', sql.Text,content)
+                .input('fechahora',sql.DateTime,now)
                 .input('stringfiles',sql.NVarChar,chained)
-                .input('remitente',sql.NVarChar, `${parsedUser.matricula}-${parsedUser.nombre}`)
                 .input('idUsuario',sql.Int, parsedUser.id)
                 .input('idPost', sql.Int, postTarget)
-                .query('INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,REMITENTE,IDUSUARIO,IDPOST)' +
-                    ' VALUES (@contenido, @fechahora, @stringfiles, @remitente, @idUsuario, @idPost)');
+                .query(`INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,IDUSUARIO,IDPOST)
+                         VALUES (@contenido, @fechahora, @stringfiles, @idUsuario, @idPost)`);
             
             //Actualizar comentarios de Post
             await pool.request()
@@ -123,22 +109,24 @@ router.post('/fetch_posts', async(req,res) => {
     
     try {
         const request = await pool.request();
-        let query = "SELECT * FROM POST";
+        let query = `SELECT p.*, (a.matricula + '-' + a.nombre) AS remitente 
+            FROM POST p
+            INNER JOIN ALUMNO a ON p.idUsuario = a.idUsuario`;
 
         //MODO MIS POSTS
         if(mode === 'my_posts'){
             request.input('idUsuario', sql.Int, userData.id);
-            query += ' WHERE IDUSUARIO = @idUsuario';   
+            query += ' WHERE p.IDUSUARIO = @idUsuario';   
         }
         else if(mode === 'user_posts'){
-            request.input('remitente', sql.NVarChar, `${userData.matricula}-${userData.nombre}`);
-            query += ' WHERE REMITENTE != @remitente';
+            request.input('idUsuario', sql.Int,);
+            query += ' WHERE p.IDUSUARIO != @idUsuario';
         }
 
         //DEFAULT GENERAL
+        query += ' ORDER BY p.FECHAHORA ASC';
         const result = await request.query(query);
-        return res.status(200).json(result.recordset);
-      
+        return res.status(200).json(result.recordset);  
     } catch (error) {
         console.error('Algo salio mal al cargar', error);
         res.status(500).json({message: 'Error interno del servidor (FETCH)'}); 
@@ -174,25 +162,22 @@ router.delete('/erase_post',async(req,res) => {
     }
 
     try {
-        //TIENE ARCHIVOS
+        //VERIFICAR Y BORRAR ARCHIVOS
         if(stringTarget !== ''){
             let filesTarget = stringTarget.split('-');
-                
             for (const file of filesTarget) {
-                const filePath = path.resolve('./public/appUploads', file);
-                        
-                //Verificar y borrar
+                const filePath = path.resolve('./public/appUploads', file);   
                 await fs.accessSync(filePath);
                 await fs.unlinkSync(filePath)
             }
         }
 
         //BORRAR SUS COMENTARIOS
-        await pool.request()
-            .input('idPost', sql.Int, postTarget)
-            .query('DELETE FROM COMENTARIO WHERE IDPOST = @idPost');
+        //await pool.request()
+          //  .input('idPost', sql.Int, postTarget)
+           // .query('DELETE FROM COMENTARIO WHERE IDPOST = @idPost');
 
-        //BORRAR POST
+        //BORRAR POST COMENTARIOS DELETE ON CASCADE
         await pool.request()
             .input('idPost', sql.Int, postTarget)
             .query('DELETE FROM POST WHERE IDPOST = @idPost');
@@ -206,8 +191,6 @@ router.delete('/erase_post',async(req,res) => {
 
 
 //EDITAR POST
-
-
 router.put('/update_post', async(req,res) => {
     const { newTitle, newContent, idPost, idUser } = req.body;
 
@@ -216,28 +199,19 @@ router.put('/update_post', async(req,res) => {
     }
 
     try {
-
         await pool.request()
             .input('titulo', sql.NVarChar, newTitle)
-            .input('contenido', sql.NVarChar, newContent)
+            .input('contenido', sql.Text, newContent)
             .input('idPost', sql.Int, idPost)
             .input('idUsuario', sql.Int, idUser)
-            .query('UPDATE POST SET TITULO = @titulo, CONTENIDO = @contenido WHERE ' + 
-                'IDPOST = @idPost AND IDUSUARIO = @idUsuario')
+            .query(`UPDATE POST SET TITULO = @titulo, CONTENIDO = @contenido WHERE 
+                IDPOST = @idPost AND IDUSUARIO = @idUsuario`);
 
-        return res.status(200).json({message: 'Post Eliminado'}); 
+        return res.status(200).json({message: 'Post Actualizado'}); 
     } catch (error) {
         console.error('Error al actualizar el Post', error);
         res.status(500).json({message: 'Error interno del servidor (UpdatePost)'}); 
     }
-
-    
-
-
-
 });
-
-
-
 
 export default router;
