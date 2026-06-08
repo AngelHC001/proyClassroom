@@ -44,8 +44,9 @@ function FileContainer({filesData}){
     return(
        <div className="col">
             <div className="card left-side border-0">
-                <img className="card-img-top img-fluid rounded" 
-                    src={`${APP_FOLDER}/${filechain[0]}`} width={50} height={50}/> 
+              
+                <img className="card-img-top img-fluid rounded admin-file-preview" 
+                src={`${APP_FOLDER}/${filechain[0]}`}/> 
                 
                 <ul className="list-group list-group-flush text-center">
                     <li className="list-group-item">{filechain.length} Imagen(es)</li>

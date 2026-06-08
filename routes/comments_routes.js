@@ -1,10 +1,8 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-
 import sql from 'mssql';
 import { pool } from './db_connection.js';
-
 
 const router = express.Router();
 
@@ -18,8 +16,12 @@ router.get('/fetch_comment/:id', async(req,res) => {
     try {
         const result = await pool.request()
             .input('idPost', sql.Int, idPost)
-            .query("SELECT * FROM COMENTARIO WHERE IDPOST = @idPost");
-        
+            .query(` SELECT c.*, (a.matricula + '-' + a.nombre) AS remitente 
+                FROM COMENTARIO c
+                INNER JOIN ALUMNO a ON c.IDUSUARIO = a.idUsuario
+                WHERE c.IDPOST = @idPost
+                ORDER BY c.FECHAHORA ASC`);
+
         return res.status(200).json(result.recordset);
     } catch (error) {
         console.error('Algo salio mal al cargar (COMENTARIOS)', error);
@@ -64,16 +66,13 @@ router.delete('/erase_comment',async(req,res) => {
     }
 
     try {
-        //EL COMENTARIO TIENE ARCHIVOS?
-        if(stringTarget !== ''){
+        //EL COMENTARIO TIENE ARCHIVOS? VERIFICAR Y BORRAR
+        if(stringTarget && stringTarget !== ''){
             let filesTarget = stringTarget.split('-');
                 
             for (const file of filesTarget) {
                 const filePath = path.resolve('./public/appUploads', file);
-                        
-                //Verificar y borrar
-                await fs.accessSync(filePath);
-                await fs.unlinkSync(filePath)
+                if (fs.existsSync(filePath)) { fs.unlinkSync(filePath); }
             }
         }
 
@@ -82,10 +81,10 @@ router.delete('/erase_comment',async(req,res) => {
             .input('idComentario', sql.Int, idComment)    
             .input('idPost', sql.Int, idPost)
             .input('idUsuario', sql.Int, idUsuario)
-            .query('DELETE FROM COMENTARIO WHERE IDCOMENTARIO = @idComentario ' + 
-                'AND IDPOST = @idPost AND IDUSUARIO = @idUsuario');
+            .query(`DELETE FROM COMENTARIO WHERE IDCOMENTARIO = @idComentario 
+                AND IDPOST = @idPost AND IDUSUARIO = @idUsuario`);
 
-        //actualizar post
+        //Actualizar sus comentarios
         await pool.request()
             .input('idPost', sql.Int, idPost)
             .query('UPDATE POST SET COMENTARIOS = COMENTARIOS - 1 WHERE IDPOST = @idPost');

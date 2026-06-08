@@ -13,7 +13,7 @@ import NoCommentYet from '../assets/no-comment-yet.webp';
 
 const APIURL = import.meta.env.VITE_API_URL; 
 const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
-                    "comentarios", "remitente", "idUsuario"];
+                    "comentarios", "idUsuario", "matricula","remitente"];
     
 function CommentPost(){
     const { user } = useAuth();
@@ -21,6 +21,7 @@ function CommentPost(){
     
     //CONVERSION A OBJETO
     const values = activeView.postTarget;
+
     if (keys.length !== values.length) {
         throw new Error("Los arrays de claves y valores no tienen la misma longitud");
     }
