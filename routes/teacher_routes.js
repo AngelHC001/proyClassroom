@@ -53,7 +53,7 @@ router.post('/register_user',async(req,res) => {
     }
 });
 
-
+//BORRAR USUARIO
 router.delete('/erase_user/:id',async(req,res) => {
     const deletionId = req.params.id;
     
@@ -62,11 +62,49 @@ router.delete('/erase_user/:id',async(req,res) => {
     }
     
     try{
-        await pool.request()
-         .input('idUsuario',sql.Int, deletionId)
-         .query('DELETE FROM ALUMNO WHERE IDUSUARIO = @idUsuario')
+        //OBTENER ARCHIVOS QUE SUBIO
+        const userPostFiles = await pool.request()
+            .input('idUsuario',sql.Int,deletionId)
+            .query(`SELECT STRINGFILES FROM POST WHERE IDUSUARIO = @idUsuario
+                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`);
+
+        const userCommentFiles = await pool.request()
+            .input('idUsuario',sql.Int,deletionId)
+            .query(`SELECT STRINGFILES FROM COMENTARIO WHERE IDUSUARIO = @idUsuario
+                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`);
+
+        const allFileRecords = [...userPostFiles.recordset,...userCommentFiles.recordset];
         
-        return res.status(200).json({message: 'Usuario Eliminado'})
+        //PROCESAR Y ELIMINAR
+        for(const record of allFileRecords){
+            if(record.STRINGFILES){
+                const files = record.STRINGFILES.split('-');
+                for(const file of files){
+                    const filePath = path.resolve('./public/appUploads', file);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            }
+        }
+
+        //BORRADO MANUAL
+        // Borrar comentarios del usuario
+        await pool.request()
+            .input('idUsuario', sql.Int, deletionId)
+            .query('DELETE FROM COMENTARIO WHERE IDUSUARIO = @idUsuario');
+
+        // Borrar posts del usuario
+        await pool.request()
+            .input('idUsuario', sql.Int, deletionId)
+            .query('DELETE FROM POST WHERE IDUSUARIO = @idUsuario');
+
+        //Borrar el usuario
+        await pool.request()
+            .input('idUsuario',sql.Int, deletionId)
+            .query('DELETE FROM ALUMNO WHERE IDUSUARIO = @idUsuario')
+        
+        return res.status(200).json({message: 'Usuario y todo su historial eliminado'})
     }
     catch(err){
         console.error('Ocurrio un error de consulta (Admin):', err);
