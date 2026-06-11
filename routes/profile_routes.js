@@ -86,22 +86,7 @@ router.put('/rewrite_data', async(req,res) => {
 
         const query = `UPDATE ALUMNO SET ${setClauses.join(', ')} WHERE IDUSUARIO = @idUsuario`
         await request.query(query);
-        
-        //ACTUALIZAR POST Y COMENTARIOS
-        const remitente = user.matricula+'-'+user.nombre;      
-        const nuevoRemitente = newData.matricula+'-'+newData.nombre;       
-        await pool.request()
-            .input('idUsuario',sql.Int,user.id) 
-            .input('remitente',sql.NVarChar,remitente) 
-            .input('nv_remitente',sql.NVarChar,nuevoRemitente)
-            .query('UPDATE POST SET REMITENTE = @nv_remitente WHERE REMITENTE = @remitente AND IDUSUARIO = @idUsuario')     
-           
-        await pool.request()
-            .input('idUsuario',sql.Int,user.id) 
-            .input('remitente',sql.NVarChar,remitente) 
-            .input('nv_remitente',sql.NVarChar,nuevoRemitente)
-            .query('UPDATE COMENTARIO SET REMITENTE = @nv_remitente WHERE REMITENTE = @remitente AND IDUSUARIO = @idUsuario')     
-        
+      
         return res.status(200).json({message: 'Datos Actualizados'});  
     } catch (error) {
         console.error('Error al actualizar perfil', error);

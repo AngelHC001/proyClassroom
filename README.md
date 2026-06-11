@@ -1,16 +1,88 @@
-# ProyClassroom
+## 🎓ProyClassroom
+Aplicación web fullstack para gestión de aula virtual con React en el frontend y Express en el backend.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🚀 Demo
 
-Currently, two official plugins are available:
+ *Próximamente* 🟡 En desarrollo activo
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Estructura
+- src: componentes e interfaces de usuario, incluyendo autenticación, perfil, publicaciones, comentarios y panel de administración.
+- routes: rutas del servidor para manejar sesión, usuarios, posts, comentarios y archivos.
+- public: datos de usuario y archivos subidos.
+- server.js: servidor Express principal.
+- vite.config.js: configuración de Vite para desarrollo rápido.
 
-## React Compiler
+### Funcionalidades
+- 🔐 Autenticación y autorización de usuarios
+- 📝 Gestión de perfiles y edición de datos.
+- Creación y visualización de publicaciones.
+- Comentarios en posts y sección de administración de contenido.
+- Subida de archivos y manejo de datos de usuario.
+- 👥 Soporte para roles administrativos/maestros.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🛠️ Tecnologías utilizadas
+- `react`, `react-dom`, `react-router-dom`
+- `@tanstack/react-query`, `@tanstack/react-query-devtools`
+- `express`, `cors`, `mssql`, `multer`, `bcrypt`
 
-## Expanding the ESLint configuration
+### Base de datos
+- **SQL Server** — Almacenamiento y gestión de datos relacionales
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+### Valor agregado
+Aplicación moderna que integra frontend reactivo con backend REST, manejo de datos en SQL y experiencia de usuario para gestión educativa en línea.
+
+## 👤 Autor
+
+**Angel HC**  
+[GitHub](https://github.com/AngelHC001)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+
+
+
+
+
+
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+proyClassroom/
+├── client/          # Aplicación React (frontend)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── ...
+├── server/          # API Node.js (backend)
+│   ├── routes/
+│   ├── controllers/
+│   └── ...
+|
+|
+|
+|
+
+└── README.md
+```
+
+> *Ajusta la estructura según la real de tu proyecto*
+
+---
+
+
+
+
+
+
+
+
+
