@@ -2,6 +2,7 @@
 import express from 'express'
 import cors from 'cors'
 
+
 //IMPORT ROUTES
 import sessionRoutes from './routes/session_routes.js'
 import postRoutes from './routes/post_routes.js'
