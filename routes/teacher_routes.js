@@ -1,9 +1,8 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-
 import bcrypt from 'bcrypt';
-import sql from 'mssql';
+
 import { pool } from './db_connection.js';
 
 const router = express.Router();
@@ -14,10 +13,10 @@ const DEFAULTIMG = 'user.png';
 //api/teacher/
 router.get('/list_users',async(req,res) => {
     try{
-        const result = await pool.query('SELECT IDUSUARIO, NOMBRE, MATRICULA, TIPOUSUARIO' + 
-            ' FROM ALUMNO ORDER BY TIPOUSUARIO DESC, MATRICULA ASC');
+        const result = await pool.query(`SELECT "idUsuario", NOMBRE, MATRICULA, TIPOUSUARIO 
+                                    FROM ALUMNO ORDER BY TIPOUSUARIO DESC, MATRICULA ASC`);
         
-        return res.status(200).json(result.recordset)
+        return res.status(200).json(result.rows);
     }
     catch(err){
         console.error('Ocurrio un error de consulta:', err);
@@ -36,14 +35,9 @@ router.post('/register_user',async(req,res) => {
     try{
         const hashedPassword = bcrypt.hashSync(DEFAULTPASS,10);
 
-        await pool.request()
-            .input('nombre',sql.NVarChar,newUser.nombre)
-            .input('matricula',sql.NVarChar,newUser.matricula)
-            .input('tipoUsuario',sql.Int,newUser.tipo)
-            .input('contrasena',sql.NVarChar,hashedPassword)
-            .input('nombreImg', sql.NVarChar,DEFAULTIMG)
-            .query('INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG)' +
-                ' VALUES (@nombre, @matricula, @contrasena, @tipoUsuario, @nombreImg)');
+        await pool.query(`INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG)
+                        VALUES ($1, $2, $3, $4, $5)`, 
+                        [newUser.nombre,newUser.matricula,newUser.tipo, hashedPassword, DEFAULTIMG]);
       
         return res.status(200).json({message: 'Nuevo usuario insertado'})
     }
@@ -63,22 +57,18 @@ router.delete('/erase_user/:id',async(req,res) => {
     
     try{
         //OBTENER ARCHIVOS QUE SUBIO
-        const userPostFiles = await pool.request()
-            .input('idUsuario',sql.Int,deletionId)
-            .query(`SELECT STRINGFILES FROM POST WHERE IDUSUARIO = @idUsuario
-                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`);
+        const userPostFiles = await pool.query(`SELECT STRINGFILES FROM POST WHERE "idUsuario" = $1
+                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`, [deletionId]);
 
-        const userCommentFiles = await pool.request()
-            .input('idUsuario',sql.Int,deletionId)
-            .query(`SELECT STRINGFILES FROM COMENTARIO WHERE IDUSUARIO = @idUsuario
-                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`);
+        const userCommentFiles = await pool.query(`SELECT STRINGFILES FROM COMENTARIO WHERE "idUsuario" = $1
+                        AND STRINGFILES IS NOT NULL AND STRINGFILES != ''`,[deletionId]);
 
-        const allFileRecords = [...userPostFiles.recordset,...userCommentFiles.recordset];
+        const allFileRecords = [...userPostFiles.rows,...userCommentFiles.rows];
         
         //PROCESAR Y ELIMINAR
         for(const record of allFileRecords){
-            if(record.STRINGFILES){
-                const files = record.STRINGFILES.split('-');
+            if(record.stringfiles){
+                const files = record.stringfiles.split('-');
                 for(const file of files){
                     const filePath = path.resolve('./public/appUploads', file);
                     if (fs.existsSync(filePath)) {
@@ -90,19 +80,13 @@ router.delete('/erase_user/:id',async(req,res) => {
 
         //BORRADO MANUAL
         // Borrar comentarios del usuario
-        await pool.request()
-            .input('idUsuario', sql.Int, deletionId)
-            .query('DELETE FROM COMENTARIO WHERE IDUSUARIO = @idUsuario');
+        await pool.query('DELETE FROM COMENTARIO WHERE "idUsuario" = $1',[deletionId]);
 
         // Borrar posts del usuario
-        await pool.request()
-            .input('idUsuario', sql.Int, deletionId)
-            .query('DELETE FROM POST WHERE IDUSUARIO = @idUsuario');
+        await pool.query('DELETE FROM POST WHERE "idUsuario" = $1',[deletionId]);
 
         //Borrar el usuario
-        await pool.request()
-            .input('idUsuario',sql.Int, deletionId)
-            .query('DELETE FROM ALUMNO WHERE IDUSUARIO = @idUsuario')
+        await pool.query('DELETE FROM ALUMNO WHERE "idUsuario" = $1',[deletionId])
         
         return res.status(200).json({message: 'Usuario y todo su historial eliminado'})
     }
@@ -124,18 +108,15 @@ router.get('/fetch_files/:id',async(req,res) => {
     }
     
     try{
-        const request = await pool.request().input('stringfiles',sql.NVarChar,'')
-        let queryStr = '';
-
         //SOLAMENTE POSTS   
-        queryStr = `SELECT p.IDPOST, p.TITULO, p.STRINGFILES, p.FECHAHORA,
-                    (a.MATRICULA + '-' + a.NOMBRE) AS REMITENTE
+        let queryStr = `SELECT p."idPost", p.TITULO, p.STRINGFILES, p.FECHAHORA,
+                    (a.MATRICULA || '-' || a.NOMBRE) AS REMITENTE
                     FROM POST p 
-                    INNER JOIN ALUMNO a ON p.IDUSUARIO = a.IDUSUARIO
-                    WHERE p.STRINGFILES IS NOT NULL AND TRIM(STRINGFILES) <> @stringfiles`;
+                    INNER JOIN ALUMNO a ON p."idUsuario" = a."idUsuario"
+                    WHERE p.STRINGFILES IS NOT NULL AND TRIM(STRINGFILES) <> $1`;
     
-        const results = await request.query(queryStr);
-        return res.status(200).json(results.recordset);
+        const results = await pool.query(queryStr,['']);
+        return res.status(200).json(results.rows);
     }
     catch(err){
         console.error('Ocurrio un error de consulta (Admin):', err);
@@ -158,7 +139,7 @@ router.delete('/erase_files', async(req,res) => {
     try{
         //SE ASUME QUE TODOS LOS REQUISITOS YA ESTAN NO SE IGNORA NINGUNO
         let table = mode === 'fromPost' ? 'POST' : 'COMENTARIO';
-        let idColumn = mode === 'fromPost' ? 'IDPOST' : 'IDCOMENTARIO';
+        let idColumn = mode === 'fromPost' ? 'idPost' : 'idCOmentario';
         let filesTarget = stringTarget.split('-');
         
         //BORRAR ARCHIVO
@@ -170,12 +151,8 @@ router.delete('/erase_files', async(req,res) => {
         }
 
         //YA SE BORRO ACTUALIZAR DATOS POST
-        await pool.request()
-            .input('idPost',sql.Int,idPost)
-            .input('stringfiles',sql.NVarChar,stringTarget)
-            .query(`UPDATE ${table} 
-                    SET STRINGFILES = '' 
-                    WHERE ${idColumn} = @idPost AND STRINGFILES = @stringfiles`);
+        await pool.query(`UPDATE ${table} SET STRINGFILES = '' 
+                    WHERE "${idColumn}" = $1 AND STRINGFILES = $2`,[idPost,stringTarget]);
 
         return res.status(200).json({message: 'Archivo borrado'});
     }

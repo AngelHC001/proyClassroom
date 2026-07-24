@@ -15,12 +15,6 @@ const db_items = [
         sectionName: 'Control de Usuarios',
         piece: 'users_control'
     },
-     {
-        key: 'admin_item1',
-        icon: 'bi bi-person-circle',
-        sectionName: 'Mi Perfil',
-        piece: 'my_profile'
-    },
     {
         key: 'admin_item3',
         icon: 'bi bi-stickies-fill',
@@ -60,16 +54,6 @@ function AdminLeftBar(){
                     <i className="bi bi-arrow-left-square"></i> Volver al Grupo
                 </Link>
             </div>    
-
-            <h3>Opciones para el Grupo</h3>
-            <form className="d-flex justify-content-center gap-2">
-                <button className="btn btn-success" name="export" type="submit">
-                    <i className="bi bi-download"></i> Guardar Actividad
-                </button>
-                <button className="btn btn-danger" name="clean" type="submit">
-                    <i className="bi bi-trash"></i> Limpiar Grupo
-                </button>
-            </form>
         </div>
     )
 }
