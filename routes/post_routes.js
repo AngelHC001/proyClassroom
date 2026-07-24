@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import sql from 'mssql';
+
 import { pool } from './db_connection.js';
 
 const router = express.Router();
@@ -58,14 +58,8 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
 
         if(mode === 'feed'){
             //PROCESO NORMAL DE POSTS    
-            await pool.request()
-                .input('titulo',sql.NVarChar,title)
-                .input('contenido', sql.Text,content)
-                .input('fechahora',sql.DateTime,now)
-                .input('stringfiles',sql.NVarChar,chained)
-                .input('idUsuario',sql.Int,parsedUser.id)
-                .query(`INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,IDUSUARIO)
-                         VALUES (@titulo, @contenido, @fechahora, @stringfiles, @idUsuario)`);  
+            await pool.query(`INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,"idUsuario")
+                            VALUES ($1, $2, $3, $4, $5)`,[title,content,now,chained,parsedUser.id]);  
         }
         else if(mode === 'comment')
         {      
@@ -74,19 +68,11 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
                 return res.status(400).json({ message: 'Sin requisitos para comentar' });
             }
 
-            await pool.request()
-                .input('contenido', sql.Text,content)
-                .input('fechahora',sql.DateTime,now)
-                .input('stringfiles',sql.NVarChar,chained)
-                .input('idUsuario',sql.Int, parsedUser.id)
-                .input('idPost', sql.Int, postTarget)
-                .query(`INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,IDUSUARIO,IDPOST)
-                         VALUES (@contenido, @fechahora, @stringfiles, @idUsuario, @idPost)`);
+            await pool.query(`INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,"idUsuario","idPost")
+                         VALUES ($1, $2, $3, $4, $5)`, [content,now,chained,parsedUser.id, postTarget]);
             
             //Actualizar comentarios de Post
-            await pool.request()
-            .input('idPost', sql.Int, postTarget)
-            .query('UPDATE POST SET COMENTARIOS = COMENTARIOS + 1 WHERE IDPOST = @idPost');
+            await pool.query('UPDATE POST SET COMENTARIOS = COMENTARIOS + 1 WHERE "idPost" = $1',[postTarget]);
         }
 
         //Dar positivo
@@ -107,25 +93,25 @@ router.post('/fetch_posts', async(req,res) => {
     }
     
     try {
-        const request = await pool.request();
-        let query = `SELECT p.*, (a.matricula + '-' + a.nombre) AS remitente 
+        let query = `SELECT p.*, (a.matricula || '-' || a.nombre) AS remitente 
             FROM POST p
-            INNER JOIN ALUMNO a ON p.idUsuario = a.idUsuario`;
+            INNER JOIN ALUMNO a ON p."idUsuario" = a."idUsuario"`;
 
+        const params = [];
         //MODO MIS POSTS
         if(mode === 'my_posts'){
-            request.input('idUsuario', sql.Int, userData.id);
-            query += ' WHERE p.IDUSUARIO = @idUsuario';   
+            query += ` WHERE p."idUsuario" = $1`;   
+            params.push(userData.id);
         }
-        else if(mode === 'user_posts'){
-            request.input('idUsuario', sql.Int,);
-            query += ' WHERE p.IDUSUARIO != @idUsuario';
+        else if(mode === 'user_posts'){   
+            query += ` WHERE p."idUsuario" != $1`;
+            params.push(userData.id);
         }
 
         //DEFAULT GENERAL
-        query += ' ORDER BY p.FECHAHORA ASC';
-        const result = await request.query(query);
-        return res.status(200).json(result.recordset);  
+        query += ` ORDER BY p.FECHAHORA ASC`;
+        const result = await pool.query(query, params.length > 0 ? params : undefined);
+        return res.status(200).json(result.rows);  
     } catch (error) {
         console.error('Algo salio mal al cargar', error);
         res.status(500).json({message: 'Error interno del servidor (FETCH)'}); 
@@ -140,9 +126,7 @@ router.get('/like_post/:id', async(req,res) => {
     }
 
     try {
-        await pool.request()
-            .input('targetPost', sql.Int, postTarget)    
-            .query('UPDATE POST SET LIKES = LIKES + 1 WHERE IDPOST = @targetPost');
+        await pool.query('UPDATE POST SET LIKES = LIKES + 1 WHERE "idPost" = $1',[postTarget]);
         return res.status(200).json({message: 'Like Post +1'});
     } catch (error) {
         console.error('Error al dar like', error);
@@ -171,16 +155,8 @@ router.delete('/erase_post',async(req,res) => {
             }
         }
 
-        //BORRAR SUS COMENTARIOS
-        //await pool.request()
-          //  .input('idPost', sql.Int, postTarget)
-           // .query('DELETE FROM COMENTARIO WHERE IDPOST = @idPost');
-
         //BORRAR POST COMENTARIOS DELETE ON CASCADE
-        await pool.request()
-            .input('idPost', sql.Int, postTarget)
-            .query('DELETE FROM POST WHERE IDPOST = @idPost');
-
+        await pool.query('DELETE FROM POST WHERE "idPost" = $1',[postTarget]);
         return res.status(200).json({message: 'Post Eliminado'});
     } catch (error) {
         console.error('Error al borrar el Post', error);
@@ -198,13 +174,8 @@ router.put('/update_post', async(req,res) => {
     }
 
     try {
-        await pool.request()
-            .input('titulo', sql.NVarChar, newTitle)
-            .input('contenido', sql.Text, newContent)
-            .input('idPost', sql.Int, idPost)
-            .input('idUsuario', sql.Int, idUser)
-            .query(`UPDATE POST SET TITULO = @titulo, CONTENIDO = @contenido WHERE 
-                IDPOST = @idPost AND IDUSUARIO = @idUsuario`);
+        await pool.query(`UPDATE POST SET TITULO = $1, CONTENIDO = $2 
+                    WHERE "idPost" = $3 AND "idUsuario" = $4`,[newTitle,newContent,idPost,idUser]);
 
         return res.status(200).json({message: 'Post Actualizado'}); 
     } catch (error) {
