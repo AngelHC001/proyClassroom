@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import sql from 'mssql';
+
 import { pool } from './db_connection.js';
 
 const router = express.Router();
@@ -14,15 +14,14 @@ router.get('/fetch_comment/:id', async(req,res) => {
     }
 
     try {
-        const result = await pool.request()
-            .input('idPost', sql.Int, idPost)
-            .query(` SELECT c.*, (a.matricula + '-' + a.nombre) AS remitente 
-                FROM COMENTARIO c
-                INNER JOIN ALUMNO a ON c.IDUSUARIO = a.idUsuario
-                WHERE c.IDPOST = @idPost
-                ORDER BY c.FECHAHORA ASC`);
+        const result = await pool.query(
+            `SELECT c.*, (a.matricula || '-' || a.nombre) AS remitente 
+            FROM COMENTARIO c
+            INNER JOIN ALUMNO a ON c."idUsuario" = a."idUsuario"
+            WHERE c."idPost" = $1
+            ORDER BY c.FECHAHORA ASC`,[idPost]);
 
-        return res.status(200).json(result.recordset);
+        return res.status(200).json(result.rows);
     } catch (error) {
         console.error('Algo salio mal al cargar (COMENTARIOS)', error);
         res.status(500).json({message: 'Error interno del servidor (COMENTARIOS)'}); 
@@ -38,16 +37,9 @@ router.put('/edit_comment', async(req,res)=>{
     }
 
     try {
-        await pool.request()
-            .input('idComentario', sql.Int, commentTarget)
-            .input('contenido', sql.NVarChar, newContent)
-            .input('idPost', sql.Int, postOrigin)    
-            .input('idUsuario', sql.Int, idUser)
-            .query(`UPDATE COMENTARIO 
-                        SET CONTENIDO = @contenido WHERE 
-                            IDCOMENTARIO = @idComentario 
-                            AND IDUSUARIO = @idUsuario
-                            AND IDPOST = @idPost`);
+        await pool.query(`UPDATE COMENTARIO SET CONTENIDO = $1 WHERE "idComentario" = $2 
+                        AND "idUsuario" = $3 AND "idPost" = $4`, 
+                        [newContent,commentTarget,idUser,postOrigin]);
 
         return res.status(200).json({message: 'Comentario Editado'});
     } catch (error) {
@@ -77,17 +69,11 @@ router.delete('/erase_comment',async(req,res) => {
         }
 
         //TRAS BORRADO ELIMINAR COMENTARIO
-        await pool.request()
-            .input('idComentario', sql.Int, idComment)    
-            .input('idPost', sql.Int, idPost)
-            .input('idUsuario', sql.Int, idUsuario)
-            .query(`DELETE FROM COMENTARIO WHERE IDCOMENTARIO = @idComentario 
-                AND IDPOST = @idPost AND IDUSUARIO = @idUsuario`);
+        await pool.query(`DELETE FROM COMENTARIO WHERE "idComentario" = $1 
+                AND "idPost" = $2 AND "idUsuario" = $3`, [idComment,idPost,idUsuario]);
 
         //Actualizar sus comentarios
-        await pool.request()
-            .input('idPost', sql.Int, idPost)
-            .query('UPDATE POST SET COMENTARIOS = COMENTARIOS - 1 WHERE IDPOST = @idPost');
+        await pool.query('UPDATE POST SET COMENTARIOS = COMENTARIOS - 1 WHERE "idPost" = $1',[idPost]);
 
         return res.status(200).json({message: 'Comentario Eliminado'});
     } catch (error) {
