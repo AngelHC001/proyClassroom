@@ -56,31 +56,30 @@ function Login(){
     return(
         <LoginContainer>
             <div className="card border-0 h-50 text-center">
-                <div className="card-header bg-primary text-light">
+                <div className="card-header btn-user text-light">
                     <h3>Iniciar Sesión</h3>
                 </div>
-
-                <form onSubmit={handleSubmit} className="p-3">
-                    <div className="input-group mb-3">
+                
+                <form className="p-3 d-flex flex-column gap-2" onSubmit={handleSubmit}>
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="mat">Matricula:</label>
                         <input className="form-control" type="text" name="mat" 
                         value={formData.mat} onChange={handleChange} required/>
                     </div>
 
-                    <div className="input-group mb-3">
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="pass">Contraseña:</label>
                         <input className="form-control" name="pass" type="password" 
                         value={formData.pass} onChange={handleChange} required/>
                     </div>
 
-                    <button className="btn btn-primary" type="submit">Entrar</button>
+                    <button className="btn border-0 btn-success btn-user" type="submit">Entrar</button>
                 </form>
 
                 <div className="card-footer">
                     <small>
                         <span>¿No tienes una cuenta? <Link to={"/register"}>Click Aqui</Link></span>
                     </small>
-                    
                 </div>
             </div>
         </LoginContainer>

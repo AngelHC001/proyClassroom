@@ -75,37 +75,37 @@ function Register(){
     return(
         <LoginContainer> 
             <div className="card border-0 text-center">
-                <div className="card-header bg-primary text-light">
+                <div className="card-header btn-user text-light">
                     <h3>Registro al grupo</h3>
                 </div>
              
-                <form onSubmit={handleSubmit} className="p-3">
-                    <div className="input-group mb-3">
+                <form className="p-3 d-flex flex-column gap-2" onSubmit={handleSubmit}>
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="nombre">Nombre:</label>
                         <input className="form-control" type="text" name="nombre" 
                         value={formData.nombre} onChange={handleChange} required/>
                     </div>
                     
-                    <div className="input-group mb-3">
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="matricula">Matricula:</label>
                         <input className="form-control" type="text" name="matricula" 
                         value={formData.matricula} onChange={handleChange} required/>
                     </div>
                     
-                    <div className="input-group mb-3">
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="pass1">Contraseña:</label>
                         <input className="form-control" name="pass1" type="password" 
                         value={passTrial.pass1} onChange={handleChange} required/>
                     </div>
                     
-                    <div className="input-group mb-3">
+                    <div className="input-group">
                         <label className="col-form-label me-2" htmlFor="pass2">Confirmar Contraseña:</label>
                         <input className="form-control" name="pass2" type="password" 
                         value={passTrial.pass2} onChange={handleChange} required/>
                     </div>
 
                     <div>
-                        <button className="btn btn-primary me-1" type="submit">Registrarse</button>
+                        <button className="btn border-0 btn-success btn-user me-1" type="submit">Registrarse</button>
                         <button className="btn btn-secondary" type="button" onClick={ClearFields}>Limpiar</button>
                     </div>
 
