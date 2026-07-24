@@ -6,11 +6,11 @@ dotenv.config();
 
 
 const pool = new Pool({
-    host: process.env.VITE_PGHOST,
-    port: process.env.VITE_PGPORT,
-    user: process.env.VITE_PGUSER,
-    password: process.env.VITE_PGPASSWORD,
-    database: process.env.VITE_PGDATABASE
+    host: process.env.PGHOST,
+    port: process.env.PGPORT,
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    database: process.env.PGDATABASE
 });
 
 async function startConnection() {

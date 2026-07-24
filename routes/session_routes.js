@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt'
-import sql from 'mssql'
+import jwt from 'jsonwebtoken';
+
 import { pool } from './db_connection.js'
 
 const router = express.Router();
@@ -19,15 +20,10 @@ router.post('/register', async(req,res) => {
     try{
         //hashear pass
         const hashedPassword = await bcrypt.hash(pass,10);
-        const defaultImg = 'user.png';
         
         //Conexion y consulta  
-        await pool.request()
-            .input('nombre',sql.NVarChar,name)
-            .input('matricula',sql.NVarChar,mat)
-            .input('contrasena',sql.NVarChar,hashedPassword)
-            .input('nombreImg', sql.NVarChar,defaultImg)
-            .query('INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG) VALUES (@nombre, @matricula, @contrasena,0,@nombreImg)')
+        await pool.query(`INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG) 
+            VALUES ($1, $2, $3, $4, $5)`,[name, mat, hashedPassword, 0, 'user.png'])
         
         //Dar positivo
         res.status(201).json({message: 'Registrado con exito, Puedes iniciar sesion'})
@@ -48,18 +44,20 @@ router.post('/login', async(req,res)=>{
 
     try {
         //BUSCAR USUARIO
-        const result = await pool.request()
-            .input('matricula',sql.NVarChar,mat)
-            .query('SELECT * FROM ALUMNO WHERE MATRICULA = @matricula');
-
-        if(result.recordset.lenght === 0)
+        const result = await pool.query('SELECT * FROM ALUMNO WHERE MATRICULA = $1',[mat]);
+        
+        if(result.rows.length === 0)
             return res.status(401).json({message: 'Credenciales incorrectas'});
 
-        const usuario = result.recordset[0];
+        const usuario = result.rows[0];
         const passValida = await bcrypt.compare(pass, usuario.contrasena);
         
         if(!passValida)
             return res.status(401).json({message: 'Credenciales incorrectas'});
+
+        //crear token
+        const token = jwt.sign({id: usuario.idUsuario, mat: usuario.matricula},
+            'lssdsk2321lfno42OAHlNKklknJkpksai',{expiresIn:'2h'});
 
         //TODO SALIO BIEN DAR POSITIVO
         res.status(200).json({
@@ -68,11 +66,11 @@ router.post('/login', async(req,res)=>{
                 id: usuario.idUsuario,
                 nombre: usuario.nombre, 
                 matricula: usuario.matricula,
-                tipo: usuario.tipoUsuario,
-                imgPerfil: usuario.nombreImg
+                tipo: usuario.tipousuario,
+                imgPerfil: usuario.nombreimg,
+                tkn: token
             }
         });
-        
     } catch (error) {
         console.error('Error en el insert:', error);
         res.status(500).json({message: 'Error interno del servidor'});     
