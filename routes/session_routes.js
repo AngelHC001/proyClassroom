@@ -7,32 +7,6 @@ import { pool } from './db_connection.js'
 const router = express.Router();
 
 
-//REGISTER
-router.post('/register', async(req,res) => {
-    const { name, mat, pass } = req.body;
-    
-    //Validación básica
-    if (!name || !mat || !pass) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-    }
-
-    //PROCESO
-    try{
-        //hashear pass
-        const hashedPassword = await bcrypt.hash(pass,10);
-        
-        //Conexion y consulta  
-        await pool.query(`INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG) 
-            VALUES ($1, $2, $3, $4, $5)`,[name, mat, hashedPassword, 0, 'user.png'])
-        
-        //Dar positivo
-        res.status(201).json({message: 'Registrado con exito, Puedes iniciar sesion'})
-    }catch(err){
-        console.error('Error en el insert:', err);
-        res.status(500).json({message: 'Error interno del servidor'});
-    }
-});
-
 //LOGIN
 router.post('/login', async(req,res)=>{
     const { mat, pass } = req.body;

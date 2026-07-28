@@ -75,12 +75,6 @@ function Login(){
 
                     <button className="btn border-0 btn-success btn-user" type="submit">Entrar</button>
                 </form>
-
-                <div className="card-footer">
-                    <small>
-                        <span>¿No tienes una cuenta? <Link to={"/register"}>Click Aqui</Link></span>
-                    </small>
-                </div>
             </div>
         </LoginContainer>
        
