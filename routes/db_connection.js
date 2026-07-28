@@ -6,6 +6,8 @@ dotenv.config();
 
 
 const pool = new Pool({
+    connectionString: process.env.DBURL,
+    ssl: { rejectUnauthorized: false },
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     user: process.env.PGUSER,
