@@ -4,7 +4,6 @@ import MainNav from "./components/nav.jsx";
 import MainSection from "./main-sections/main_section.jsx";
 import AdminSection from "./teacher-sections/admin-section.jsx";
 import Login from "./genUser-sections/login.jsx";
-import Register from "./genUser-sections/register.jsx";
 
 import {useAuth} from './genUser-sections/AuthContext.jsx'
 
@@ -22,7 +21,6 @@ function App() {
     <Routes>
       {/* Rutas Públicas (Sin NavBar) */}
       <Route path="/login" element={<Login/>}/>
-      <Route path="/register" element={<Register />} />
     
       {/* Rutas Privadas (Con NavBar) */}
       <Route path="/"
