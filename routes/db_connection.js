@@ -8,7 +8,11 @@ dotenv.config();
 
 
 const pool = new Pool({
-    connectionString: process.env.DBURL,
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    host: process.env.PGHOST,
+    port: process.env.PGPORT,
+    database: process.env.PGDATABASE,
     ssl: { 
         rejectUnauthorized: true, 
         ca: `-----BEGIN CERTIFICATE-----
@@ -36,11 +40,6 @@ oMk2bXbWiedk00Uow4CdbXsHG3JcRIHYbnb5/jLpp2NakLauL5WRUNOjxDlTqjIk
 H/xVVVFTcS7reG7lk0gCG2WNetNFi2TeFehgf3kgjhipvbrZNdW+ZFng2AJ6QEE0
 QYZcn3MJoQmpNfS6SuP1xF5coQm9Itte/7TSQ4c9T40TdGXFYu5bcA==
 -----END CERTIFICATE-----` },
-    host: process.env.PGHOST,
-    port: process.env.PGPORT,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-    database: process.env.PGDATABASE
 });
 
 async function startConnection() {
