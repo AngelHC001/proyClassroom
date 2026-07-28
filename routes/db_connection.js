@@ -2,12 +2,19 @@
 import { Pool } from "pg";
 import process from 'process'
 import dotenv from 'dotenv'
+import fs from 'fs'
+import path from "path";
+import { fileURLToPath } from "url";
+
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 const pool = new Pool({
     connectionString: process.env.DBURL,
-    ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: true, ca: fs.readFileSync(path.join(__dirname, '../certs/ca.pem')).toString() },
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     user: process.env.PGUSER,
