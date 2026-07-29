@@ -4,6 +4,7 @@ import cors from 'cors'
 import process from 'process'
 import { fileURLToPath } from 'url'
 import path from 'path'
+import cookieParser from 'cookie-parser'
 
 //IMPORT ROUTES
 import sessionRoutes from './routes/session_routes.js'
@@ -23,6 +24,7 @@ const corsOptions = { origin: process.env.NODE_ENV === 'production' ?
 
 const PORT = 3000;
 const app = express();
+app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

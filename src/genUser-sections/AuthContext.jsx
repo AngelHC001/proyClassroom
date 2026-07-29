@@ -10,12 +10,10 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(false);
-
+    const [loading, setLoading] = useState(true)
     //VerificarLogin
-    /*useEffect(() => {
+    useEffect(() => {
         const verificarSesion = async() => {
-            setLoading(true);
             try {
                 const response = await fetch(`${API_URL}/session/verify`,{
                     method: 'GET',
@@ -25,9 +23,11 @@ export const AuthProvider = ({children}) => {
                 if(response.ok){
                     const data = await response.json();
                     setUser(data.usuario);
+                    setToken(data.token);
                 }
                 else{
                     setUser(null);
+                    setToken(null);
                 }
             } catch (error) {
                 console.log('Sin sesion previa o token expiro ' + error);
@@ -38,7 +38,7 @@ export const AuthProvider = ({children}) => {
         }//funcion
 
         verificarSesion();
-    },[]);*/
+    },[]);
 
     //Definir el localStorage en el login
     const login = (userData, userToken) => {
@@ -67,6 +67,16 @@ export const AuthProvider = ({children}) => {
         }
     };
 
+    const authFetch = (url, options ={}) => {
+        return fetch(url,{
+            ...options,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    };
+
     
     if (loading) {
         return (
@@ -76,7 +86,7 @@ export const AuthProvider = ({children}) => {
     }
 
     return(
-        <AuthContext.Provider value={{user, login, logout, updateUser}}>
+        <AuthContext.Provider value={{user, login, logout, updateUser, authFetch}}>
             {children}
         </AuthContext.Provider>
     )

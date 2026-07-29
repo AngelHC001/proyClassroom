@@ -24,14 +24,21 @@ router.post('/login', async(req,res)=>{
             return res.status(401).json({message: 'Credenciales incorrectas'});
 
         const usuario = result.rows[0];
+        const datos =  {
+            id: usuario.idUsuario, 
+            nombre: usuario.nombre, 
+            matricula: usuario.matricula, 
+            tipo: usuario.tipousuario, 
+            imgPerfil: usuario.nombreimg
+        };
+
         const passValida = await bcrypt.compare(pass, usuario.contrasena);
         
         if(!passValida)
             return res.status(401).json({message: 'Credenciales incorrectas'});
 
         //crear token
-        const token = jwt.sign({id: usuario.idUsuario, mat: usuario.matricula},
-            HOMEMADE_TOKEN,{expiresIn:'2h'});
+        const token = jwt.sign(datos, HOMEMADE_TOKEN,{expiresIn:'2h'});
 
         res.cookie('auth_token', token, {
             httpOnly: true,
@@ -41,11 +48,7 @@ router.post('/login', async(req,res)=>{
         });
 
         //TODO SALIO BIEN DAR POSITIVO
-        res.status(200).json({
-            token: token,
-            usuario: { id: usuario.idUsuario, nombre: usuario.nombre, matricula: usuario.matricula, 
-                tipo: usuario.tipousuario, imgPerfil: usuario.nombreimg }
-        });
+        res.status(200).json({token: token, usuario: datos });
     } catch (error) {
         console.error('Error en el insert:', error);
         res.status(500).json({message: 'Error interno del servidor (SESSION/LOGIN)'});     
@@ -53,7 +56,6 @@ router.post('/login', async(req,res)=>{
 });
 
 
-/*
 router.get('/verify', async(req,res) => {
     const token = req.cookies.auth_token;
 
@@ -63,13 +65,19 @@ router.get('/verify', async(req,res) => {
 
     try {
         const decoded = jwt.verify(token, HOMEMADE_TOKEN);
-        const user = {id: decoded.id, mat: decoded.mat}
+        const user = {
+            id: decoded.id, 
+            nombre: decoded.nombre, 
+            matricula: decoded.matricula,
+            tipo: decoded.tipo,
+            imgPerfil: decoded.imgPerfil
+        }
         return res.status(200).json({token: token, usuario: user});
     } catch (error) {
         res.status(500).json({message: 'Error interno del servidor (SESSION/VERIFY) ' + error}); 
     }
 });
-*/
+
 
 router.get('/exit', async(req,res) => {
     const token = req.cookies.auth_token;
