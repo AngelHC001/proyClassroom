@@ -1,11 +1,11 @@
 import express from 'express';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
+import process from 'process';
 
 import { pool } from './db_connection.js'
-
 const router = express.Router();
-
+const HOMEMADE_TOKEN = process.env.HOMEMADE_TOKEN;
 
 //LOGIN
 router.post('/login', async(req,res)=>{
@@ -31,23 +31,58 @@ router.post('/login', async(req,res)=>{
 
         //crear token
         const token = jwt.sign({id: usuario.idUsuario, mat: usuario.matricula},
-            'lssdsk2321lfno42OAHlNKklknJkpksai',{expiresIn:'2h'});
+            HOMEMADE_TOKEN,{expiresIn:'2h'});
+
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 100
+        });
 
         //TODO SALIO BIEN DAR POSITIVO
         res.status(200).json({
-            message:'Login Exitoso', 
-            usuario:{
-                id: usuario.idUsuario,
-                nombre: usuario.nombre, 
-                matricula: usuario.matricula,
-                tipo: usuario.tipousuario,
-                imgPerfil: usuario.nombreimg,
-                tkn: token
-            }
+            token: token,
+            usuario: { id: usuario.idUsuario, nombre: usuario.nombre, matricula: usuario.matricula, 
+                tipo: usuario.tipousuario, imgPerfil: usuario.nombreimg }
         });
     } catch (error) {
         console.error('Error en el insert:', error);
-        res.status(500).json({message: 'Error interno del servidor'});     
+        res.status(500).json({message: 'Error interno del servidor (SESSION/LOGIN)'});     
+    }
+});
+
+
+/*
+router.get('/verify', async(req,res) => {
+    const token = req.cookies.auth_token;
+
+    if(!token){
+        return res.status(201).json({message: 'No hay sesion activa'});
+    }
+
+    try {
+        const decoded = jwt.verify(token, HOMEMADE_TOKEN);
+        const user = {id: decoded.id, mat: decoded.mat}
+        return res.status(200).json({token: token, usuario: user});
+    } catch (error) {
+        res.status(500).json({message: 'Error interno del servidor (SESSION/VERIFY) ' + error}); 
+    }
+});
+*/
+
+router.get('/exit', async(req,res) => {
+    const token = req.cookies.auth_token;
+
+    if(!token){
+        return res.status(201).json({message: 'No hay sesion activa'});
+    }
+
+    try {
+        res.clearCookie('auth_token');
+        return res.status(200).json({message: 'CERRLA SESION'});
+    } catch (error) {
+        res.status(500).json({message: 'Error interno del servidor (SESSION/EXIT) ' + error}); 
     }
 });
 

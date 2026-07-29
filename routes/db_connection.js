@@ -2,10 +2,7 @@ import { Pool } from "pg";
 import process from 'process'
 import dotenv from 'dotenv'
 
-
 dotenv.config();
-
-
 
 const pool = new Pool({
     user: process.env.PGUSER,
@@ -13,7 +10,7 @@ const pool = new Pool({
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     database: process.env.PGDATABASE,
-    ssl: { 
+   /* ssl: { 
         rejectUnauthorized: true, 
         ca: `-----BEGIN CERTIFICATE-----
 MIIERDCCAqygAwIBAgIUC35r8Q7E15ibrwGjS0EJ7vl2AicwDQYJKoZIhvcNAQEM
@@ -39,7 +36,7 @@ hK70+kpQJk7Q6bp6cgl5YZyfpAC8Pg+gz8fGD1fhcNcZ0c3BWDW64iGXHqWHdRzy
 oMk2bXbWiedk00Uow4CdbXsHG3JcRIHYbnb5/jLpp2NakLauL5WRUNOjxDlTqjIk
 H/xVVVFTcS7reG7lk0gCG2WNetNFi2TeFehgf3kgjhipvbrZNdW+ZFng2AJ6QEE0
 QYZcn3MJoQmpNfS6SuP1xF5coQm9Itte/7TSQ4c9T40TdGXFYu5bcA==
------END CERTIFICATE-----` },
+-----END CERTIFICATE-----` },*/
 });
 
 async function startConnection() {
@@ -55,34 +52,3 @@ async function startConnection() {
 startConnection();
 
 export { pool };
-
-/*SQL SERVER CONFIG
-const config = {
-    server: "localhost",
-    user: 'ClassroomTester',
-    password: 'classroom$2026',
-    database: 'ProyClassroom',
-    timezone: '-06:00',
-    port: 1433,
-    options:{
-        encrypt: false,                 // Set to true if using Azure or SSL
-        trustServerCertificate: true    // For local development
-    }    
-};
-
-/*
-let pool;
-async function startConnection() {
-    try {
-        const pool = await sql.connect(config);
-        console.log('✅ SQL SERVER Connection successful!');
-    } catch (err) {
-        console.error('❌ Connection failed! ', err.message);
-    }
-}*/
-
-
-
-
-
-

@@ -5,12 +5,6 @@ import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
 const IMGPATH = '../appUserData/';
 
-
-
-
-
-
-
 function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
     const { activeView, setActiveView } = useView(); //CONTEXTO DE COMPONENTE RIGHT SIDE
@@ -19,11 +13,6 @@ function ProfileArea(){
     
     const btnLabel = activeView.type === 'my_posts' ? 'Volver' : 'Mis Posts';
     const btnLabel2 = activeView.type === 'my_profile' ? 'Volver' : 'Mi Perfil';
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    }
 
     const buttons = [
         user?.tipo === 1 && {
@@ -52,7 +41,7 @@ function ProfileArea(){
             className: 'btn btn-dark border-0',
             label: 'Cerrar Sesion',
             icon: 'bi bi-box-arrow-left',
-            callback: handleLogout
+            callback: () => logout()
         }
     ].filter(Boolean);
 
