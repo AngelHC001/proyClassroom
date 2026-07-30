@@ -1,8 +1,7 @@
 import express from 'express';
-import path from 'path';
-import fs from 'fs';
 
 import { pool } from './db_connection.js';
+import { delete_cdy, extractPublicId } from './utils.js';
 
 const router = express.Router();
 
@@ -60,12 +59,11 @@ router.delete('/erase_comment',async(req,res) => {
     try {
         //EL COMENTARIO TIENE ARCHIVOS? VERIFICAR Y BORRAR
         if(stringTarget && stringTarget !== ''){
+            
             let filesTarget = stringTarget.split('-');
-                
-            for (const file of filesTarget) {
-                const filePath = path.resolve('./public/appUploads', file);
-                if (fs.existsSync(filePath)) { fs.unlinkSync(filePath); }
-            }
+            const publicIds = filesTarget.map((url) => extractPublicId(url));
+            const deletePromises = publicIds.map(id => delete_cdy(id));
+            await Promise.all(deletePromises);    
         }
 
         //TRAS BORRADO ELIMINAR COMENTARIO

@@ -10,7 +10,6 @@ import DisplayError from "../components/error_banner";
 import LoadingSpinner from "../components/loading_spinner";
 import NoDataYet from '../assets/no-data-yet.webp';
 
-const APP_FOLDER = './appUploads/';
 const API_URL = import.meta.env.VITE_API_URL;
 
 function FileContainer({filesData}){
@@ -18,7 +17,7 @@ function FileContainer({filesData}){
     const { activeView } = useView();
     const queryClient = useQueryClient(); 
 
-    const filechain = filesData?.STRINGFILES.split('-');
+    const filechain = filesData?.stringfiles.split('-');
     //MODES - FROMPOST/FROMCOMMENT
 
     const deleteFileMutation = useMutation({
@@ -46,13 +45,13 @@ function FileContainer({filesData}){
             <div className="card left-side border-0">
               
                 <img className="card-img-top img-fluid rounded admin-file-preview" 
-                src={`${APP_FOLDER}/${filechain[0]}`}/> 
+                src={`${filechain[0]}`}/> 
                 
                 <ul className="list-group list-group-flush text-center">
                     <li className="list-group-item">{filechain.length} Imagen(es)</li>
-                    <li className="list-group-item">Post: {filesData?.TITULO}</li>
-                    <li className="list-group-item">De: {filesData?.REMITENTE}</li>
-                    <li className="list-group-item">{filesData?.FECHAHORA}</li>
+                    <li className="list-group-item">Post: {filesData?.titulo}</li>
+                    <li className="list-group-item">De: {filesData?.remitente}</li>
+                    <li className="list-group-item">{filesData?.fechahora}</li>
                 </ul>
                             
                 <div className="card-footer flex-row text-center">
@@ -61,7 +60,7 @@ function FileContainer({filesData}){
                     </a>
                             
                     <button className="btn btn-danger" onClick={() => 
-                        deleteFileMutation.mutate([filesData?.IDPOST, filesData?.STRINGFILES])}>
+                        deleteFileMutation.mutate([filesData?.idPost, filesData?.stringfiles])}>
                         <i className="bi bi-trash-fill"/>
                     </button>                
                 </div>
@@ -114,7 +113,7 @@ function AdminFiles(){
 
                 { data?.length > 0 && 
                     data?.map((filePack) => (
-                        <FileContainer key={filePack?.IDPOST} filesData={filePack}/>       
+                        <FileContainer key={filePack?.idpost} filesData={filePack}/>       
                     )) 
                 }  
                 <br />

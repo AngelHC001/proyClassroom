@@ -1,61 +1,29 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 
 import { pool } from './db_connection.js';
+import { upload, upload_cdy, delete_cdy, extractPublicId } from './utils.js';
 
 const router = express.Router();
-
-//IMPORT multer
-//-config storage
-//-filtrar formatos (opcional)
-//-config upload
-//-set into server operation (post,put, delete, etc)
-
-//CONFIGURAR DESTINO Y archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./public/appUploads/"); // tu carpeta destino
-  },
-  filename: (req, file, cb) => {
-    const unique = "UploadedImg" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `${unique}${ext}`);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  const allowed = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-  allowed.includes(file.mimetype) ? cb(null, true) : cb(null, false);
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB por archivo
-});
 
 //PUBLICAR INSERT Y DELETE
 router.post('/upload_post', upload.array('images',5), async(req,res) => {
     //Recibe datos
     const { title, content, remitent, mode, postTarget} = req.body;
-    const files = req.files?.map((f) => f.filename) ?? [];
-    
+    const files = req.files;
+
     //Validacion debe haber al menos uno ocupado
     if(title === '' && content === '' && files.length === 0){
         return res.status(400).json({ message: 'No hay nada que publicar' });
     }
 
-    if(!fs.existsSync('./public/appUploads')){
-        return res.status(400).json('EL DIRECTORIO DE UPLOADS NO EXISTE');
-    }
-
     try {
-        const parsedUser = JSON.parse(remitent);
-        const chained = files.join('-');
-        const now = new Date(); 
+        //Mapear archivos para cloudinary
+        const uploadPromises = files.map((f) => upload_cdy(f.buffer,'appUploads'));
+        const results = await Promise.all(uploadPromises);
+        const chained = results.map((r) => r.secure_url).join('-');
 
+        const parsedUser = JSON.parse(remitent);
+        const now = new Date(); 
         if(mode === 'feed'){
             //PROCESO NORMAL DE POSTS    
             await pool.query(`INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,"idUsuario")
@@ -148,11 +116,10 @@ router.delete('/erase_post',async(req,res) => {
         //VERIFICAR Y BORRAR ARCHIVOS
         if(stringTarget !== ''){
             let filesTarget = stringTarget.split('-');
-            for (const file of filesTarget) {
-                const filePath = path.resolve('./public/appUploads', file);   
-                await fs.accessSync(filePath);
-                await fs.unlinkSync(filePath)
-            }
+            const publicIds = filesTarget.map((url) => extractPublicId(url));
+            
+            const deletePromises = publicIds.map(id => delete_cdy(id));
+            await Promise.all(deletePromises);
         }
 
         //BORRAR POST COMENTARIOS DELETE ON CASCADE

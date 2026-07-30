@@ -1,28 +1,9 @@
-import express from 'express';
-import multer from 'multer'  
+import express from 'express';  
 import bcrypt from 'bcrypt';
-import { pool, cloudinary } from './db_connection.js';
+import { pool } from './db_connection.js';
+import { upload, upload_cdy } from './utils.js';
 
 const router = express.Router();
-
-//MULTER FILE UPLOAD CONFIG 
-const storage = multer.memoryStorage();
-const upload = multer({storage:storage});
-
-const upload_cdy = (buffer,foldername) => {
-    return new Promise((resolve,reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-            {folder:foldername},
-            (error,result) => {
-                if(result)
-                    resolve(result);
-                else
-                    reject(error);
-            }
-        );
-        stream.end(buffer);
-    });
-}
 
 //EDITAR PERFIL (UPLOAD SINGLE MUEVE ARCHIVO)
 router.put('/change_picture', upload.single('newImg'), async(req,res) => {
