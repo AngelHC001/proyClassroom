@@ -1,24 +1,28 @@
 import express from 'express';
-import fs from 'node:fs'       
 import multer from 'multer'  
 import bcrypt from 'bcrypt';
+import { pool, cloudinary } from './db_connection.js';
 
-import { pool } from './db_connection.js';
 const router = express.Router();
 
 //MULTER FILE UPLOAD CONFIG 
-const storage = multer.diskStorage({
-    destination: (req,file,cb) => {
-        cb(null,'./public/appUserData/');
-    },
-    filename: (req,file,cb) => {
-        const uniqName = Date.now() + "-" + file.originalname;
-        cb(null,uniqName);
-    }
-});
+const storage = multer.memoryStorage();
+const upload = multer({storage:storage});
 
-const upload = multer({storage});
-
+const upload_cdy = (buffer,foldername) => {
+    return new Promise((resolve,reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {folder:foldername},
+            (error,result) => {
+                if(result)
+                    resolve(result);
+                else
+                    reject(error);
+            }
+        );
+        stream.end(buffer);
+    });
+}
 
 //EDITAR PERFIL (UPLOAD SINGLE MUEVE ARCHIVO)
 router.put('/change_picture', upload.single('newImg'), async(req,res) => {
@@ -29,16 +33,15 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
         return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
     }
 
-    if(!fs.existsSync('./public/appUserData')){
-        return res.status(400).json('EL DIRECTORIO PARA FOTO DE PERFIL NO EXISTE');
-    }
-
     try {
-        //REGISTRAR NUEVO NOMBRE
+        //SUBIR A CLOUDINARY
+        const result = await upload_cdy(newImg.buffer, 'userData');
+        
+        //REGISTRAR NOMBRE DE ARCHIVO
         await pool.query(`UPDATE ALUMNO SET NOMBREIMG = $1 WHERE "idUsuario" = $2 AND MATRICULA = $3`, 
-                        [newImg.filename, userOnline.id, userOnline.mat])
+                        [result.secure_url, userOnline.id, userOnline.mat])
 
-        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: newImg.filename});  
+        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: result.secure_url});  
     } catch (error) {
         console.error('Error al actualizar perfil', error);
         res.status(500).json({message: 'Error interno del servidor'}); 

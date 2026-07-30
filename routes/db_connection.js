@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import process from 'process'
 import dotenv from 'dotenv'
+import { v2 } from "cloudinary";
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ const pool = new Pool({
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     database: process.env.PGDATABASE,
-    ssl: { 
+    /*ssl: { 
         rejectUnauthorized: true, 
         ca: `-----BEGIN CERTIFICATE-----
 MIIERDCCAqygAwIBAgIUC35r8Q7E15ibrwGjS0EJ7vl2AicwDQYJKoZIhvcNAQEM
@@ -36,8 +37,25 @@ hK70+kpQJk7Q6bp6cgl5YZyfpAC8Pg+gz8fGD1fhcNcZ0c3BWDW64iGXHqWHdRzy
 oMk2bXbWiedk00Uow4CdbXsHG3JcRIHYbnb5/jLpp2NakLauL5WRUNOjxDlTqjIk
 H/xVVVFTcS7reG7lk0gCG2WNetNFi2TeFehgf3kgjhipvbrZNdW+ZFng2AJ6QEE0
 QYZcn3MJoQmpNfS6SuP1xF5coQm9Itte/7TSQ4c9T40TdGXFYu5bcA==
------END CERTIFICATE-----` },
+-----END CERTIFICATE-----` },*/
 });
+
+//CLOUDINARY PARA SUBIR IMAGENES
+// Validación
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_SECRET) {
+  console.error("⚠️ Faltan las variables de entorno de Cloudinary");
+}
+
+const cloudinary = v2;
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET 
+});
+
+console.log('CLOUDINARY CONECTADO');
+
+
 
 async function startConnection() {
     try {
@@ -51,4 +69,5 @@ async function startConnection() {
 
 startConnection();
 
-export { pool };
+
+export { pool, cloudinary };

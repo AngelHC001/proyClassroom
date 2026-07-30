@@ -1,10 +1,10 @@
 //INITIALIZATE
-import express from 'express'
-import cors from 'cors'
-import process from 'process'
-import { fileURLToPath } from 'url'
-import path from 'path'
-import cookieParser from 'cookie-parser'
+import express from 'express';
+import cors from 'cors';
+import process from 'process';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import cookieParser from 'cookie-parser';
 
 //IMPORT ROUTES
 import sessionRoutes from './routes/session_routes.js'
