@@ -1,7 +1,7 @@
 import express from 'express';  
 import bcrypt from 'bcrypt';
 import { pool } from './db_connection.js';
-import { upload, upload_cdy } from './utils.js';
+import { upload, upload_cdy, extractRegistry } from './utils.js';
 
 const router = express.Router();
 
@@ -16,13 +16,14 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
 
     try {
         //SUBIR A CLOUDINARY
-        const result = await upload_cdy(newImg.buffer, 'userData');
-        
+        const result = await upload_cdy(newImg.buffer, 'appUserData');
+        const registry = extractRegistry(result.secure_url);
+
         //REGISTRAR NOMBRE DE ARCHIVO
         await pool.query(`UPDATE ALUMNO SET NOMBREIMG = $1 WHERE "idUsuario" = $2 AND MATRICULA = $3`, 
-                        [result.secure_url, userOnline.id, userOnline.mat])
+                          [registry, userOnline.id, userOnline.mat])
 
-        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: result.secure_url});  
+        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: registry});  
     } catch (error) {
         console.error('Error al actualizar perfil', error);
         res.status(500).json({message: 'Error interno del servidor'}); 

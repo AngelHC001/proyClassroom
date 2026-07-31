@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL; 
 
 function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
@@ -48,8 +49,8 @@ function ProfileArea(){
         <div className="row text-center p-2">   
             <div className="col border-dark border-end">
                 <h3>{user?.nombre}</h3>
-                <img className="img-fluid rounded" src={user?.imgPerfil} alt="userProfile"
-                    style={{width:80, height:80, objectFit: 'contain'}}/>
+                <img className="img-fluid rounded-circle" src={CLOUD_URL + user?.imgPerfil} alt="userProfile"
+                    style={{width:100, height:100, objectFit: 'contain'}}/>
                 <p>{user?.matricula}</p>
             </div>
 

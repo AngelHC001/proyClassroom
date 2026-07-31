@@ -52,7 +52,7 @@ const delete_cdy = async(publicId) => {
 const extractPublicId = (url) => {
     const segments = url.split('/');
 
-    const folderIndex = segments.findIndex(seg => seg === 'userData' || seg === 'appUploads');
+    const folderIndex = segments.findIndex(seg => seg === 'appUserData' || seg === 'appUploads');
     if(folderIndex === -1) return null;
 
     //Quitarle la extension de la imagen
@@ -61,8 +61,15 @@ const extractPublicId = (url) => {
     return publicId;
 }
 
+const extractRegistry = (url) => {
+    const segments = url.split('/');
+    const folderIndex = segments.findIndex(seg => seg === 'upload');
+    if(folderIndex === -1) return null;
 
+    //Quitarle la extension de la imagen
+    const publicIdExt = segments.slice(folderIndex + 1).join('/');
+    return publicIdExt;
+}
 
-
-export { upload, upload_cdy, delete_cdy, extractPublicId };
+export { upload, upload_cdy, delete_cdy, extractPublicId, extractRegistry };
 

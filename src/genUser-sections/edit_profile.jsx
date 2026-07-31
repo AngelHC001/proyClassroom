@@ -2,7 +2,8 @@ import React, {useState} from "react";
 import {useAuth} from './AuthContext.jsx'
 import SectionHeader from "../components/section-header.jsx";
 
-const APIURL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
 
 function ChangePic({setMessage}){
     const { user, updateUser } = useAuth();
@@ -28,7 +29,7 @@ function ChangePic({setMessage}){
         formData.append('userOnline', JSON.stringify({id: user.id, mat: user.matricula}));
         
         try{
-            const response = await fetch(`${APIURL}/profile/change_picture`,{
+            const response = await fetch(`${API_URL}/profile/change_picture`,{
                 method: 'PUT',
                 body: formData             
             })
@@ -52,24 +53,24 @@ function ChangePic({setMessage}){
     return(
         <div className="col-md-6 border-light border-end border-3 text-center">
             <h1>{user?.nombre}</h1>      
-            <img className="img-fluid rounded mb-3" src={user?.imgPerfil} 
+            <img className="img-fluid rounded-circle mb-3" src={CLOUD_URL + user?.imgPerfil} 
                 style={{width:150, height: 150, objectFit: 'contain'}}/>
             
             {newImg && (<small className="row">{newImg.name}</small>)}
             
-            <form className="d-flex justify-content-center gap-1" onSubmit={onChangePicture} encType="multipart/form-data">
-                <button className="btn btn-dark" type="button" onClick={clear}>
+            <form className="d-flex justify-content-center gap-2" onSubmit={onChangePicture} encType="multipart/form-data">
+                <button className="btn btn-dark btn-lg rounded-circle" type="button" onClick={clear} title="Deshacer">
                     <small><i className="bi bi-arrow-counterclockwise"/></small>
                 </button>
                 
-                <label className="btn btn-primary">
-                    <i className="bi bi-camera"></i> Cambiar Foto
+                <label className="btn btn-success border-0 btn-admin btn-lg rounded-circle" title="Cambiar Foto">
+                    <i className="text-light bi bi-camera"></i> 
                     <input type="file" name="newImg" onChange={handleFileChange} 
                     onClick={clear} accept="image/*"/>
                 </label>
                     
-                <button className="btn btn-success" type="submit">
-                    <small><i className="bi bi-floppy"/>Guardar</small>
+                <button className="btn btn-success border-0 btn-user btn-lg rounded-circle" type="submit" title="Guardar">
+                    <small><i className="text-light bi bi-floppy"/></small>
                 </button>
             </form>
             <small><i className="bi bi-info-circle"/> Elige una foto y pulsa Guardar.</small>   
@@ -108,7 +109,7 @@ function ChangeData({setMessage}){
         }
 
         try{
-            const response = await fetch(`${APIURL}/profile/rewrite_data`,{
+            const response = await fetch(`${API_URL}/profile/rewrite_data`,{
                 method: 'PUT',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({newData, user})       
