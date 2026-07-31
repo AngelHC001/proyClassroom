@@ -48,7 +48,8 @@ function ProfileArea(){
         <div className="row text-center p-2">   
             <div className="col border-dark border-end">
                 <h3>{user?.nombre}</h3>
-                <img className="img-fluid rounded" src={user?.imgPerfil} width="80" height="80" alt="userProfile"/>
+                <img className="img-fluid rounded" src={user?.imgPerfil} alt="userProfile"
+                    style={{width:80, height:80, objectFit: 'contain'}}/>
                 <p>{user?.matricula}</p>
             </div>
 

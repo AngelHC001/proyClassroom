@@ -21,7 +21,6 @@ const db_items = [
         sectionName: 'Post de Alumnos',
         piece: 'manage_posts'
     },
-   
     {
         key: 'admin_item4',
         icon: 'bi bi-file-zip-fill',
@@ -63,7 +62,6 @@ function AdminRightBar(){
     return(
         <div className="col-md-8 right-side">
             {activeView.type === 'users_control' &&  <AdminControl/>}
-            {activeView.type === 'my_profile' && <EditSection/>}
             {activeView.type === 'manage_posts' && <PostContainer/>}
             {activeView.type === 'manage_files' && <AdminFiles/>} 
         </div>
@@ -71,7 +69,7 @@ function AdminRightBar(){
 }
 
 function AdminSection(){
-    const [activeView, setActiveView] = useState({type: 'my_profile'});
+    const [activeView, setActiveView] = useState({type: 'users_control'});
    
     return(
         <ViewContext.Provider value={{activeView, setActiveView}}>

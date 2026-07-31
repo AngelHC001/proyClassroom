@@ -52,7 +52,8 @@ function ChangePic({setMessage}){
     return(
         <div className="col-md-6 border-light border-end border-3 text-center">
             <h1>{user?.nombre}</h1>      
-            <img className="img-fluid rounded mb-3" src={user?.imgPerfil} width={150} height={150}/>
+            <img className="img-fluid rounded mb-3" src={user?.imgPerfil} 
+                style={{width:150, height: 150, objectFit: 'contain'}}/>
             
             {newImg && (<small className="row">{newImg.name}</small>)}
             
