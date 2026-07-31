@@ -59,7 +59,6 @@ router.delete('/erase_comment',async(req,res) => {
     try {
         //EL COMENTARIO TIENE ARCHIVOS? VERIFICAR Y BORRAR
         if(stringTarget && stringTarget !== ''){
-            
             let filesTarget = stringTarget.split('-');
             const publicIds = filesTarget.map((url) => extractPublicId(url));
             const deletePromises = publicIds.map(id => delete_cdy(id));

@@ -3,7 +3,6 @@ import { useView } from "./viewContext";
 import { usePostMutations } from "../genUser-actions/usePostMutations";
 import FileContainer from "./file_container";
 
-const APIURL = import.meta.env.VITE_API_URL;
 const opciones = {
     timeZone: "America/Mexico_City",
     day: "2-digit", month: "2-digit", year: "numeric",

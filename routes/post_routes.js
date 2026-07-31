@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { pool } from './db_connection.js';
-import { upload, upload_cdy, delete_cdy, extractPublicId } from './utils.js';
+import { upload, upload_cdy, delete_cdy, extractPublicId, extractRegistry } from './utils.js';
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
         //Mapear archivos para cloudinary
         const uploadPromises = files.map((f) => upload_cdy(f.buffer,'appUploads'));
         const results = await Promise.all(uploadPromises);
-        const chained = results.map((r) => r.secure_url).join('-');
+        const chained = results.map((r) => extractRegistry(r.secure_url)).join('-');
 
         const parsedUser = JSON.parse(remitent);
         const now = new Date(); 

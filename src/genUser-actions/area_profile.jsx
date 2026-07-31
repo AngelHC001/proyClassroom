@@ -47,14 +47,14 @@ function ProfileArea(){
 
     return(
         <div className="row text-center p-2">   
-            <div className="col border-dark border-end">
-                <h3>{user?.nombre}</h3>
+            <div className="col d-flex flex-column align-items-center gap-2 border-dark border-end">
+                <h5>{user?.nombre}</h5>
                 <img className="img-fluid rounded-circle" src={CLOUD_URL + user?.imgPerfil} alt="userProfile"
-                    style={{width:100, height:100, objectFit: 'contain'}}/>
+                    style={{width:80, height:80, objectFit: 'contain'}}/>
                 <p>{user?.matricula}</p>
             </div>
 
-            <div className="col d-flex flex-column gap-2 mt-3">
+            <div className="col d-flex flex-column gap-2">
                 {buttons.map(b => (
                     <button key={b.key} className={b.className} onClick={b.callback}>
                         <i className={b.icon}></i> {b.label}

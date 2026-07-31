@@ -1,5 +1,7 @@
 import React from "react"
 
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
+
 function Modal({filename}){
     return(
         <div className="modal fade" id={'modalShow'+filename} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -10,7 +12,7 @@ function Modal({filename}){
                     </div>
 
                     <div className="modal-body text-center">
-                        <img className="img-fluid rounded" src={filename} 
+                        <img className="img-fluid rounded" src={CLOUD_URL + filename} 
                             style={{ width: 250, height: 250, objectFit: "contain"}} />
                     </div>
                     
@@ -19,7 +21,7 @@ function Modal({filename}){
                             <i className="bi bi-x" />
                         </button>
                     
-                        <a className="btn btn-outline-light border-0 rounded-circle" href={filename} download={filename}>
+                        <a className="btn btn-outline-light border-0 rounded-circle" href={CLOUD_URL + filename} download={filename}>
                             <i className="bi bi-download"/>    
                         </a>
                         
@@ -35,7 +37,7 @@ export default function FileContainer({file}){
         <div>
             <button type="button" className="btn border-0" 
                 data-bs-toggle="modal" data-bs-target={'#modalShow'+file}>
-                <img className="img-fluid rounded" src={file}
+                <img className="img-fluid rounded" src={CLOUD_URL + file}
                     style={{ width: 180, height: 180, objectFit: "contain"}}/>
             </button>
 
