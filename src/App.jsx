@@ -46,11 +46,11 @@ function App() {
     <Routes>
         <Route path="/login" element={<Login/>}/>
 
-        <Route path="/" element={user !== null ? 
+        <Route path="/" element={user ? 
           <HomeBracket routeName={"/"} replace/> : 
           <Navigate to={"/login"}/>} />
 
-        <Route path="/admin-section" element={user !== null ? 
+        <Route path="/admin-section" element={user ? 
           <HomeBracket routeName={"admin-section"} replace/> : 
           <Navigate to={"/login"} /> }/>
     </Routes>

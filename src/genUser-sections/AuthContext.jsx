@@ -67,16 +67,6 @@ export const AuthProvider = ({children}) => {
         }
     };
 
-    const authFetch = (url, options ={}) => {
-        return fetch(url,{
-            ...options,
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-    };
-
     
     if (loading) {
         return (
@@ -86,7 +76,7 @@ export const AuthProvider = ({children}) => {
     }
 
     return(
-        <AuthContext.Provider value={{user, login, logout, updateUser, authFetch}}>
+        <AuthContext.Provider value={{user, login, logout, updateUser}}>
             {children}
         </AuthContext.Provider>
     )
