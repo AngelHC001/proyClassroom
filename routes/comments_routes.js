@@ -14,7 +14,7 @@ router.get('/fetch_comment/:id', async(req,res) => {
 
     try {
         const result = await pool.query(
-            `SELECT c.*, (a.matricula || '-' || a.nombre) AS remitente 
+            `SELECT c.*, a.nombreimg AS fotoremit, (a.matricula || '-' || a.nombre) AS remitente 
             FROM COMENTARIO c
             INNER JOIN ALUMNO a ON c."idUsuario" = a."idUsuario"
             WHERE c."idPost" = $1
