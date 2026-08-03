@@ -28,10 +28,11 @@ function UserDataContainer({userData, onDelete}){
             <td>{userData?.matricula}</td>
             <td>{userData?.tipousuario === 0 ? 'Alumno' : 'Administrador'}</td>
             <td>
+                { userData?.tipousuario == 0 &&
                 <button className="btn btn-sm btn-danger" type="submit" title="Borrar" 
                  onClick={() => onDelete(userData?.idUsuario)}>
                     <i className="bi bi-dash-circle-fill"/>
-                </button>
+                </button> }
             </td>
         </tr>
     )

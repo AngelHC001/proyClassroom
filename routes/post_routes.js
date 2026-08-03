@@ -61,7 +61,7 @@ router.post('/fetch_posts', async(req,res) => {
     }
     
     try {
-        let query = `SELECT p.*, (a.matricula || '-' || a.nombre) AS remitente 
+        let query = `SELECT p.*, a.nombreimg AS fotoremit ,(a.matricula || '-' || a.nombre) AS remitente 
             FROM POST p
             INNER JOIN ALUMNO a ON p."idUsuario" = a."idUsuario"`;
 
