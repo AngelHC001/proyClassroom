@@ -36,7 +36,7 @@ router.post('/register_user',async(req,res) => {
 
         await pool.query(`INSERT INTO ALUMNO (NOMBRE, MATRICULA, CONTRASENA, TIPOUSUARIO, NOMBREIMG)
                         VALUES ($1, $2, $3, $4, $5)`, 
-                        [newUser.nombre,newUser.matricula,newUser.tipo, hashedPassword, DEFAULTIMG]);
+                        [newUser.nombre, newUser.matricula, hashedPassword, newUser.tipo, DEFAULTIMG]);
       
         return res.status(200).json({message: 'Nuevo usuario insertado'})
     }
