@@ -71,7 +71,7 @@ router.post('/fetch_posts', async(req,res) => {
             query += ` WHERE p."idUsuario" = $1`;   
             params.push(userData.id);
         }
-        else if(mode === 'user_posts'){   
+        else if(mode === 'manage_posts'){   
             query += ` WHERE p."idUsuario" != $1`;
             params.push(userData.id);
         }

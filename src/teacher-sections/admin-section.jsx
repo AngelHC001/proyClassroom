@@ -16,13 +16,13 @@ const db_items = [
         piece: 'users_control'
     },
     {
-        key: 'admin_item3',
+        key: 'admin_item1',
         icon: 'bi bi-stickies-fill',
         sectionName: 'Post de Alumnos',
         piece: 'manage_posts'
     },
     {
-        key: 'admin_item4',
+        key: 'admin_item2',
         icon: 'bi bi-file-zip-fill',
         sectionName: 'Archivos Enviados',
         piece: 'manage_files'
@@ -33,7 +33,6 @@ const db_items = [
 function AdminLeftBar(){
     const { activeView, setActiveView } = useView();
     
-
     return(
         <div className="col-md-4 left-side text-center p-3">
             <h2 className="display-6">Administrar Clase</h2>

@@ -1,9 +1,8 @@
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
 import bcrypt from 'bcrypt';
 
 import { pool } from './db_connection.js';
+import { extractPublicId, delete_cdy } from './utils.js';
 
 const router = express.Router();
 
@@ -69,12 +68,9 @@ router.delete('/erase_user/:id',async(req,res) => {
         for(const record of allFileRecords){
             if(record.stringfiles){
                 const files = record.stringfiles.split('-');
-                for(const file of files){
-                    const filePath = path.resolve('./public/appUploads', file);
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                    }
-                }
+                const publicIds = files.map((url) => extractPublicId(url));
+                const deletePromises = publicIds.map(id => delete_cdy(id));
+                await Promise.all(deletePromises);
             }
         }
 
@@ -95,8 +91,6 @@ router.delete('/erase_user/:id',async(req,res) => {
         res.status(500).json({message: 'Error interno del servidor'});
     }
 });
-
-
 
 
 //SECCION MANAGE FILES
@@ -131,25 +125,17 @@ router.delete('/erase_files', async(req,res) => {
     if(!idPost || !stringTarget || !mode){
         return res.status(400).json({message: 'Sin requisitos para consulta'})
     }
-    
-    if(!fs.existsSync('./public/appUploads')){
-        return res.status(400).json({message: 'La carpeta Uploads no existe'})
-    }
 
     try{
         //SE ASUME QUE TODOS LOS REQUISITOS YA ESTAN NO SE IGNORA NINGUNO
         let table = mode === 'fromPost' ? 'POST' : 'COMENTARIO';
-        let idColumn = mode === 'fromPost' ? 'idPost' : 'idCOmentario';
+        let idColumn = mode === 'fromPost' ? 'idPost' : 'idComentario';
         let filesTarget = stringTarget.split('-');
+         
+        const publicIds = filesTarget.map((url) => extractPublicId(url));
+        const deletePromises = publicIds.map(id => delete_cdy(id));
+        await Promise.all(deletePromises);
         
-        //BORRAR ARCHIVO
-        for (const file of filesTarget) {
-            const filePath = path.resolve('./public/appUploads', file);
-            if(fs.existsSync(filePath)){
-                fs.unlinkSync(filePath)
-            }
-        }
-
         //YA SE BORRO ACTUALIZAR DATOS POST
         await pool.query(`UPDATE ${table} SET STRINGFILES = '' 
                     WHERE "${idColumn}" = $1 AND STRINGFILES = $2`,[idPost,stringTarget]);

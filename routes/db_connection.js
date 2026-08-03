@@ -3,7 +3,6 @@ import process from 'process'
 import dotenv from 'dotenv'
 import { v2 } from "cloudinary";
 import fs from 'fs';
-import console from "console";
 
 dotenv.config();
 
@@ -15,7 +14,7 @@ const pool = new Pool({
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     database: process.env.PGDATABASE,
-    ssl: { rejectUnauthorized: true, ca: cert_key}
+    //ssl: { rejectUnauthorized: true, ca: cert_key}
 });
 
 //CLOUDINARY PARA SUBIR IMAGENES
