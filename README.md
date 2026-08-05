@@ -1,70 +1,38 @@
 ## 🎓ProyClassroom
-Aplicación web fullstack para gestión de aula virtual con React en el frontend y Express en el backend.
+Aplicación Web FullStack inspirado en un chat grupal de un canal de Teams, 
+utilicé la tematica de la franquicia **Umamusume Pretty Derby** para simular las conversaciones.
+
+En este canal virtual solitario puedes subir publicaciones, comentar y ajustar tu perfil de usuario de forma básica;
+la subida de archivos esta limitada exclusivamente a imagenes (post y comentarios).
+
 
 ## 🚀 Demo
-
  *Próximamente* 🟡 En desarrollo activo
 ---
 
-### Estructura
-- src: componentes e interfaces de usuario, incluyendo autenticación, perfil, publicaciones, comentarios y panel de administración.
-- routes: rutas del servidor para manejar sesión, usuarios, posts, comentarios y archivos.
-- public: datos de usuario y archivos subidos.
-- server.js: servidor Express principal.
-- vite.config.js: configuración de Vite para desarrollo rápido.
+### Estructura Interna
+- Frontend: ReactJS
+- Backend: Express
+- Base de Datos Relacional: PostgreSQL (Service en Aiven)
+      -- INFO: branch main usa SQLServer pero las barreras de pago y las limitaciones estrictas
+          no fueron convenientes para el host en su lugar creé el branch postgre mode
+- Cloudinary v2: API dedicada para el uso de Cloudinary, nube para guardar imagenes.
 
 ### Funcionalidades
-- 🔐 Autenticación y autorización de usuarios
+- 🔐 Autenticación y autorización de usuarios.
 - 📝 Gestión de perfiles y edición de datos.
 - Creación y visualización de publicaciones.
 - Comentarios en posts y sección de administración de contenido.
 - Subida de archivos y manejo de datos de usuario.
 - 👥 Soporte para roles administrativos/maestros.
 
+
 ### 🛠️ Tecnologías utilizadas
 - `react`, `react-dom`, `react-router-dom`
 - `@tanstack/react-query`, `@tanstack/react-query-devtools`
 - `express`, `cors`, `mssql`, `multer`, `bcrypt`
+- `pg`, `jwt`
 
-### Base de datos
-- **SQL Server** — Almacenamiento y gestión de datos relacionales
-
-
-## 📁 Estructura del proyecto
-
-```
-proyClassroom/
-├── routes/         # Rutas Node.js (backend)
-│   ├── comments_routes.js
-|   ├── db_connection.js
-│   ├── post_routes.js
-|   ├── profile_routes.js
-|   ├── session_routes.js
-|   └── teacher_routes.js
-|   
-├── src/            # Aplicación React (frontend)
-│   ├── assets/
-│   ├── compontens/
-|   ├── genUser-actions/
-|   ├── genUser-sections/
-|   ├── main-sections/
-|   ├── teacher-sections/
-|   ├── App.jsx
-|   ├── index.css
-│   └── main.jsx
-|
-├── .env.development
-├── .env.production
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── README.md
-├── server.js       # API Node.js (backend)
-└── vite.config.js
-
-```
 ---
 
 ### Valor agregado
