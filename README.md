@@ -38,6 +38,41 @@ Multer & Cloudinary (Gestión de subida de archivos multimedia)
 
 👥 Roles de Usuario: Soporte para roles administrativos o de "maestros" dentro de la plataforma.
 
+## 📁 Estructura del proyecto
+
+```
+proyClassroom/
+├── routes/         # Rutas Node.js (backend)
+│   ├── comments_routes.js
+|   ├── db_connection.js
+│   ├── post_routes.js
+|   ├── profile_routes.js
+|   ├── session_routes.js
+|   └── teacher_routes.js
+|   
+├── src/            # Aplicación React (frontend)
+│   ├── assets/
+│   ├── compontens/
+|   ├── genUser-actions/
+|   ├── genUser-sections/
+|   ├── main-sections/
+|   ├── teacher-sections/
+|   ├── App.jsx
+|   ├── index.css
+│   └── main.jsx
+|
+├── .env.development
+├── .env.production
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── README.md
+├── server.js       # API Node.js (backend)
+└── vite.config.js
+
+```
 
 ## 👤 Autor
 
