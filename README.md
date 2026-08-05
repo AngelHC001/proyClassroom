@@ -34,9 +34,10 @@ la subida de archivos esta limitada exclusivamente a imagenes (post y comentario
 - `pg`, `jwt`
 
 ---
-
-### Valor agregado
-Aplicación moderna que integra frontend reactivo con backend REST, manejo de datos en SQL y experiencia de usuario para gestión educativa en línea.
+### Resumen del Deploy
+- Frontend/Backend: Render (Free Tier)
+- Base de Datos Postgre: Aiven
+- Guardado de Imagenes: Cloudinary
 
 ## 👤 Autor
 
