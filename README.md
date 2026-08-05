@@ -61,8 +61,6 @@ proyClassroom/
 |   ├── index.css
 │   └── main.jsx
 |
-├── .env.development
-├── .env.production
 ├── .gitignore
 ├── eslint.config.js
 ├── index.html
