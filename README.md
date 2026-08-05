@@ -7,7 +7,7 @@ la subida de archivos esta limitada exclusivamente a imagenes (post y comentario
 
 
 ## 🚀 Demo
- *Próximamente* 🟡 En desarrollo activo
+ https://proyclassroom.onrender.com/
 ---
 
 ### Estructura Interna
