@@ -9,6 +9,7 @@ https://proyclassroom.onrender.com/
 - Almacenamiento de Medios: Cloudinary v2 (para la gestión exclusiva de imágenes en publicaciones y comentarios).
 
 Nota técnica: El repositorio cuenta con una rama main configurada originalmente para SQL Server. Sin embargo, debido a limitaciones de costos y barreras de infraestructura en el free tier, se implementó y adaptó la rama postgre-mode para garantizar una alta disponibilidad de despliegue en la nube.
+
 ---
 ### 🛠️ Tecnologías utilizadas
 Frontend
