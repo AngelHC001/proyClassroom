@@ -1,43 +1,42 @@
 ## 🎓ProyClassroom
-Aplicación Web FullStack inspirado en un chat grupal de un canal de Teams, 
-utilicé la tematica de la franquicia **Umamusume Pretty Derby** para simular las conversaciones.
+Aplicación web FullStack inspirada en la dinámica de un chat grupal de canales de Microsoft Teams, ambientada con la temática de la franquicia Umamusume Pretty Derby para simular las interacciones de los usuarios.
 
-En este canal virtual solitario puedes subir publicaciones, comentar y ajustar tu perfil de usuario de forma básica;
-la subida de archivos esta limitada exclusivamente a imagenes (post y comentarios).
-
-
-## 🚀 Demo
- https://proyclassroom.onrender.com/
+## 🚀 Demo y Arquitectura
+https://proyclassroom.onrender.com/
 ---
+- Frontend y Backend: Desplegados en Render (Free Tier).
+- Base de Datos: PostgreSQL alojada en Aiven.
+- Almacenamiento de Medios: Cloudinary v2 (para la gestión exclusiva de imágenes en publicaciones y comentarios).
 
-### Estructura Interna
-- Frontend: ReactJS
-- Backend: Express
-- Base de Datos Relacional: PostgreSQL (Service en Aiven)
-      -- INFO: branch main usa SQLServer pero las barreras de pago y las limitaciones estrictas
-          no fueron convenientes para el host en su lugar creé el branch postgre mode
-- Cloudinary v2: API dedicada para el uso de Cloudinary, nube para guardar imagenes.
-
-### Funcionalidades
-- 🔐 Autenticación y autorización de usuarios.
-- 📝 Gestión de perfiles y edición de datos.
-- Creación y visualización de publicaciones.
-- Comentarios en posts y sección de administración de contenido.
-- Subida de archivos y manejo de datos de usuario.
-- 👥 Soporte para roles administrativos/maestros.
-
-
+Nota técnica: El repositorio cuenta con una rama main configurada originalmente para SQL Server. Sin embargo, debido a limitaciones de costos y barreras de infraestructura en el free tier, se implementó y adaptó la rama postgre-mode para garantizar una alta disponibilidad de despliegue en la nube.
+---
 ### 🛠️ Tecnologías utilizadas
-- `react`, `react-dom`, `react-router-dom`
-- `@tanstack/react-query`, `@tanstack/react-query-devtools`
-- `express`, `cors`, `mssql`, `multer`, `bcrypt`
-- `pg`, `jwt`
+Frontend
+ReactJS & React Router DOM (Enrutamiento y vistas de usuario)
+
+@tanstack/react-query & Devtools (Gestión de estado servidor y caché)
+
+Backend & Base de Datos
+Node.js con Express (API RESTful)
+
+PostgreSQL & pg (Base de datos relacional)
+
+Bcrypt & JWT (Autenticación y seguridad de contraseñas)
+
+Multer & Cloudinary (Gestión de subida de archivos multimedia)
 
 ---
-### Resumen del Deploy
-- Frontend/Backend: Render (Free Tier)
-- Base de Datos Postgre: Aiven
-- Guardado de Imagenes: Cloudinary
+### Funcionalidades Principales
+🔐 Sistema de Autenticación: Registro, login seguro y autorización mediante tokens (JWT).
+
+📝 Gestión de Perfiles: Edición de datos de usuario e imagen de perfil.
+
+💬 Interactividad Social: Creación de publicaciones, sección de comentarios y administración de contenido.
+
+🖼️ Multimedia Integrada: Subida de imágenes optimizada y limitada exclusivamente a posts y comentarios mediante Cloudinary.
+
+👥 Roles de Usuario: Soporte para roles administrativos o de "maestros" dentro de la plataforma.
+
 
 ## 👤 Autor
 
@@ -45,7 +44,6 @@ la subida de archivos esta limitada exclusivamente a imagenes (post y comentario
 [GitHub](https://github.com/AngelHC001)
 
 ---
-
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
