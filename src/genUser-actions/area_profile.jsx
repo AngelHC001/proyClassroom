@@ -3,13 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
-const IMGPATH = '../appUserData/';
-
-
-
-
-
-
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL; 
 
 function ProfileArea(){
     const { user, logout } = useAuth();  //user es un objeto, recuperado del login
@@ -19,11 +13,6 @@ function ProfileArea(){
     
     const btnLabel = activeView.type === 'my_posts' ? 'Volver' : 'Mis Posts';
     const btnLabel2 = activeView.type === 'my_profile' ? 'Volver' : 'Mi Perfil';
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    }
 
     const buttons = [
         user?.tipo === 1 && {
@@ -52,19 +41,20 @@ function ProfileArea(){
             className: 'btn btn-dark border-0',
             label: 'Cerrar Sesion',
             icon: 'bi bi-box-arrow-left',
-            callback: handleLogout
+            callback: () => logout()
         }
     ].filter(Boolean);
 
     return(
         <div className="row text-center p-2">   
-            <div className="col border-dark border-end">
-                <h3>{user?.nombre}</h3>
-                <img className="img-fluid rounded" src={IMGPATH + user?.imgPerfil} width="80" height="80" alt="userProfile"/>
+            <div className="col d-flex flex-column align-items-center gap-2 border-dark border-end">
+                <h5>{user?.nombre}</h5>
+                <img className="img-fluid rounded-circle" src={CLOUD_URL + user?.imgPerfil} alt="userProfile"
+                    style={{width:80, height:80, objectFit: 'contain'}}/>
                 <p>{user?.matricula}</p>
             </div>
 
-            <div className="col d-flex flex-column gap-2 mt-3">
+            <div className="col d-flex flex-column gap-2">
                 {buttons.map(b => (
                     <button key={b.key} className={b.className} onClick={b.callback}>
                         <i className={b.icon}></i> {b.label}

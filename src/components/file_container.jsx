@@ -1,5 +1,6 @@
 import React from "react"
-const APP_PATH = '/appUploads/';
+
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
 
 function Modal({filename}){
     return(
@@ -11,18 +12,16 @@ function Modal({filename}){
                     </div>
 
                     <div className="modal-body text-center">
-                        <img className="img-fluid rounded" src={APP_PATH + filename} 
-                            width={200} height={200}/>
+                        <img className="img-fluid rounded" src={CLOUD_URL + filename} 
+                            style={{ width: 250, height: 250, objectFit: "contain"}} />
                     </div>
                     
                     <div className="modal-footer">
-                        <span className="text-light">{filename}</span>
-
                         <button type="button" className="btn btn-outline-light border-0 rounded-circle" data-bs-dismiss="modal">
                             <i className="bi bi-x" />
                         </button>
                     
-                        <a className="btn btn-outline-light border-0 rounded-circle" href={APP_PATH + filename} download={APP_PATH + filename}>
+                        <a className="btn btn-outline-light border-0 rounded-circle" href={CLOUD_URL + filename} download={filename}>
                             <i className="bi bi-download"/>    
                         </a>
                         
@@ -36,8 +35,10 @@ function Modal({filename}){
 export default function FileContainer({file}){
     return(
         <div>
-            <button type="button" className="btn border-0" data-bs-toggle="modal" data-bs-target={'#modalShow'+file}>
-                <img className="img-fluid rounded" src={APP_PATH + file} width={120} height={120}/>
+            <button type="button" className="btn border-0" 
+                data-bs-toggle="modal" data-bs-target={'#modalShow'+file}>
+                <img className="img-fluid rounded" src={CLOUD_URL + file}
+                    style={{ width: 180, height: 180, objectFit: "contain"}}/>
             </button>
 
             <Modal filename={file}/>

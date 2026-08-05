@@ -5,7 +5,6 @@ import { usePostMutations } from "./usePostMutations";
 import { useAuth } from "../genUser-sections/AuthContext";
 import { useView } from "../components/viewContext";
 
-
 function PostArea(){
     const { user } = useAuth();
     const { activeView } = useView();
@@ -120,7 +119,7 @@ function PostArea(){
                          disabled={selectedFiles.length >= MAX} onChange={handleFiles}/>
                     </label>
                     
-                    <button className="btn btn-outline-danger border-0" type="button" title="Cancelar"
+                    <button className="btn btn-outline-danger border-0 rounded-circle" type="button" title="Cancelar"
                     onClick={clearFields}>
                         <i className="bi bi-x-circle fs-5"/>
                     </button>
@@ -136,8 +135,7 @@ function PostArea(){
                     (<span>
                         <i className="bi bi-image-fill"/> {selectedFiles.length}/{MAX}
                         <ul>
-                            {selectedFiles.map((file,i) => (
-                                <li key={i}>{file.name}</li>))}
+                            { selectedFiles.map((file,i) => (<li key={i}>{file.name}</li>)) }
                         </ul>
                     </span>)
                 }

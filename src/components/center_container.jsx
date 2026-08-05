@@ -1,9 +1,10 @@
 
 function LoginContainer({children}){
     return(
-        <div className="container-fluid bg1">
-            <div className="text-center py-2">
-                <h1 className="display-3">Classroom: Habilidades del Pensamiento</h1>
+        <div className="container-fluid bg1 text-center">
+            
+            <div className="right-side m-2 py-4 p-2 text-light rounded-pill border border-light border-3">
+                <h1>Classroom: Habilidades del Pensamiento</h1>
                 <h3 className="display-6">Bienvenido</h3>
             </div>
             

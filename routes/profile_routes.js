@@ -1,26 +1,9 @@
-import express from 'express';
-import fs from 'node:fs'       
-import multer from 'multer'  
+import express from 'express';  
 import bcrypt from 'bcrypt';
-
-import sql from 'mssql';
 import { pool } from './db_connection.js';
+import { upload, upload_cdy, extractRegistry } from './utils.js';
+
 const router = express.Router();
-
-
-//MULTER FILE UPLOAD CONFIG 
-const storage = multer.diskStorage({
-    destination: (req,file,cb) => {
-        cb(null,'./public/appUserData/');
-    },
-    filename: (req,file,cb) => {
-        const uniqName = Date.now() + "-" + file.originalname;
-        cb(null,uniqName);
-    }
-});
-
-const upload = multer({storage});
-
 
 //EDITAR PERFIL (UPLOAD SINGLE MUEVE ARCHIVO)
 router.put('/change_picture', upload.single('newImg'), async(req,res) => {
@@ -31,19 +14,16 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
         return res.status(400).json('SIN REQUISITOS PARA CAMBIOS');
     }
 
-    if(!fs.existsSync('./public/appUserData')){
-        return res.status(400).json('EL DIRECTORIO PARA FOTO DE PERFIL NO EXISTE');
-    }
-
     try {
-        //REGISTRAR NUEVO NOMBRE
-        await pool.request()
-            .input('idUsuario',sql.Int ,userOnline.id)
-            .input('matricula',sql.NVarChar,userOnline.mat)
-            .input('nombreImg',sql.NVarChar,newImg.filename)
-            .query('UPDATE ALUMNO SET NOMBREIMG = @nombreImg WHERE IDUSUARIO = @idUsuario AND MATRICULA = @matricula;')
+        //SUBIR A CLOUDINARY
+        const result = await upload_cdy(newImg.buffer, 'appUserData');
+        const registry = extractRegistry(result.secure_url);
 
-        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: newImg.filename});  
+        //REGISTRAR NOMBRE DE ARCHIVO
+        await pool.query(`UPDATE ALUMNO SET NOMBREIMG = $1 WHERE "idUsuario" = $2 AND MATRICULA = $3`, 
+                          [registry, userOnline.id, userOnline.mat])
+
+        return res.status(200).json({message: 'Foto de Perfil Cambiada', newProf: registry});  
     } catch (error) {
         console.error('Error al actualizar perfil', error);
         res.status(500).json({message: 'Error interno del servidor'}); 
@@ -56,27 +36,26 @@ router.put('/rewrite_data', async(req,res) => {
     const { newData, user } = req.body;
 
     try {
-        const request = await pool.request();
-        request.input('idUsuario',sql.Int ,user.id)
+        const params = []; 
         const setClauses = [];
         
         //Cambio nombre?
         if(newData.nombre !== user.nombre){
-            request.input('newName',sql.NVarChar,newData.nombre)
-            setClauses.push('NOMBRE = @newName');
+            params.push(newData.nombre);
+            setClauses.push(`NOMBRE = $${params.length}`);
         }
        
         //Cambio matricula?
         if(newData.matricula !== user.matricula){
-            request.input('newMat',sql.NVarChar,newData.matricula)
-            setClauses.push('MATRICULA = @newMat');
+            params.push(newData.matricula);
+            setClauses.push(`MATRICULA = $${params.length}`);
         }
       
         //NuevaPass?
         if(newData.npass1 !== ''){
             const newHashed = await bcrypt.hash(newData.npass1,10);
-            request.input('contrasena',sql.NVarChar,newHashed)
-            setClauses.push('CONTRASENA = @contrasena');  
+            params.push(newHashed);
+            setClauses.push(`CONTRASENA = $${params.length}`);  
         }
 
         //SIN CAMBIOS
@@ -84,8 +63,9 @@ router.put('/rewrite_data', async(req,res) => {
             return res.status(400).json({message: 'Sin cambios ingresados'});
         }
 
-        const query = `UPDATE ALUMNO SET ${setClauses.join(', ')} WHERE IDUSUARIO = @idUsuario`
-        await request.query(query);
+        params.push(user.id);
+        const query = `UPDATE ALUMNO SET ${setClauses.join(', ')} WHERE "idUsuario" = $${params.length}`
+        await pool.query(query,params);
       
         return res.status(200).json({message: 'Datos Actualizados'});  
     } catch (error) {

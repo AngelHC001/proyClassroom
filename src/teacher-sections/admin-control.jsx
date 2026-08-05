@@ -24,14 +24,15 @@ function TableHeaders(){
 function UserDataContainer({userData, onDelete}){
     return(
         <tr>
-            <td>{userData?.NOMBRE}</td>
-            <td>{userData?.MATRICULA}</td>
-            <td>{userData?.TIPOUSUARIO === 0 ? 'Alumno' : 'Administrador'}</td>
+            <td>{userData?.nombre}</td>
+            <td>{userData?.matricula}</td>
+            <td>{userData?.tipousuario === 0 ? 'Alumno' : 'Administrador'}</td>
             <td>
+                { userData?.tipousuario == 0 &&
                 <button className="btn btn-sm btn-danger" type="submit" title="Borrar" 
-                 onClick={() => onDelete(userData?.IDUSUARIO)}>
+                 onClick={() => onDelete(userData?.idUsuario)}>
                     <i className="bi bi-dash-circle-fill"/>
-                </button>
+                </button> }
             </td>
         </tr>
     )
@@ -181,9 +182,9 @@ function AdminControl(){
                     <tbody>
                         <TableHeaders/>
                         {
-                            data?.map((u) => (u.IDUSUARIO !== user?.id &&
-                                <UserDataContainer key={u.IDUSUARIO} 
-                                userData={u} onDelete={() => deleteMutation.mutate(u?.IDUSUARIO)}/>))
+                            data?.map((u) => (u.idUsuario !== user?.id &&
+                                <UserDataContainer key={u.idUsuario} 
+                                userData={u} onDelete={() => deleteMutation.mutate(u?.idUsuario)}/>))
                         }
                     </tbody>
                 </table>

@@ -10,15 +10,25 @@ import DisplayError from "../components/error_banner";
 import LoadingSpinner from "../components/loading_spinner";
 import NoDataYet from '../assets/no-data-yet.webp';
 
-const APP_FOLDER = './appUploads/';
 const API_URL = import.meta.env.VITE_API_URL;
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
+
+const opciones = {
+    timeZone: "America/Mexico_City",
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit", hour12: false // formato 24h
+};
+
 
 function FileContainer({filesData}){
     const { user } = useAuth();
     const { activeView } = useView();
     const queryClient = useQueryClient(); 
 
-    const filechain = filesData?.STRINGFILES.split('-');
+    const fecha = new Date(filesData?.fechahora);
+    const fechaFormateada = new Intl.DateTimeFormat("es-Mx", opciones).format(fecha);
+
+    const filechain = filesData?.stringfiles.split('-');
     //MODES - FROMPOST/FROMCOMMENT
 
     const deleteFileMutation = useMutation({
@@ -44,24 +54,19 @@ function FileContainer({filesData}){
     return(
        <div className="col">
             <div className="card left-side border-0">
-              
                 <img className="card-img-top img-fluid rounded admin-file-preview" 
-                src={`${APP_FOLDER}/${filechain[0]}`}/> 
+                src={CLOUD_URL + filechain[0]}/> 
                 
                 <ul className="list-group list-group-flush text-center">
                     <li className="list-group-item">{filechain.length} Imagen(es)</li>
-                    <li className="list-group-item">Post: {filesData?.TITULO}</li>
-                    <li className="list-group-item">De: {filesData?.REMITENTE}</li>
-                    <li className="list-group-item">{filesData?.FECHAHORA}</li>
+                    <li className="list-group-item">Post: {filesData?.titulo}</li>
+                    <li className="list-group-item">De: {filesData?.remitente}</li>
+                    <li className="list-group-item">{fechaFormateada}</li>
                 </ul>
                             
-                <div className="card-footer flex-row text-center">
-                    <a className="btn btn-primary me-2">
-                        <i className="bi bi-download"/>
-                    </a>
-                            
+                <div className="card-footer flex-row text-center">        
                     <button className="btn btn-danger" onClick={() => 
-                        deleteFileMutation.mutate([filesData?.IDPOST, filesData?.STRINGFILES])}>
+                        deleteFileMutation.mutate([filesData?.idPost, filesData?.stringfiles])}>
                         <i className="bi bi-trash-fill"/>
                     </button>                
                 </div>
@@ -114,7 +119,7 @@ function AdminFiles(){
 
                 { data?.length > 0 && 
                     data?.map((filePack) => (
-                        <FileContainer key={filePack?.IDPOST} filesData={filePack}/>       
+                        <FileContainer key={filePack?.idpost} filesData={filePack}/>       
                     )) 
                 }  
                 <br />

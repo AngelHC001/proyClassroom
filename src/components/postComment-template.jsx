@@ -9,6 +9,9 @@ const opciones = { timeZone: "America/Mexico_City",
     hour: "2-digit", minute: "2-digit", hour12: false 
 };
 
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
+
+
 const class_button = 'btn btn-outline-light border-0 rounded-circle'
 
 // Botón para Activar/Desactivar Edición
@@ -51,9 +54,12 @@ function Comment({CommentData}){
 
     return(
         <div className="rounded p-2 comment">
-            <div className="d-flex justify-content-between border-bottom">
-                <span><b>{CommentData?.remitente}</b></span>
-                <span>{fechaFormateada}</span>
+            <div className="text-end d-flex align-items-center flex-wrap gap-2 border-bottom">
+                <img className="img-fluid rounded-circle" src={CLOUD_URL + CommentData?.fotoremit} alt="commentImgUser"
+                    style={{width:40, height:40, objectFit:"contain"}}/>
+                
+                <div className="fw-bold">{CommentData?.remitente}</div>
+                <small>{fechaFormateada}</small>
             </div>
             
             {

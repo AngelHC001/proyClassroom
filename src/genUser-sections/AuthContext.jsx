@@ -1,34 +1,79 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 //IMPORTAR CREATE, USE
 //EXPORTAR VARIABLE DE CREACION
 //EXPORTAR HOOK DE CREACION
 
+const API_URL = import.meta.env.VITE_API_URL;
 const AuthContext = createContext(null); 
 
 export const AuthProvider = ({children}) => {
-    // Al iniciar, intenta recuperar el usuario de localStorage
-    const [user,setUser] = useState(()=>{
-        const stored = localStorage.getItem("alumno");
-        return stored ? JSON.parse(stored) : null;
-    }); 
-    
-    //definir el localStorage en el login
-    const login = (userData) => {
-        localStorage.setItem("alumno", JSON.stringify(userData));
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+    const [loading, setLoading] = useState(true)
+    //VerificarLogin
+    useEffect(() => {
+        const verificarSesion = async() => {
+            try {
+                const response = await fetch(`${API_URL}/session/verify`,{
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if(response.ok){
+                    const data = await response.json();
+                    setUser(data.usuario);
+                    setToken(data.token);
+                }
+                else{
+                    setUser(null);
+                    setToken(null);
+                }
+            } catch (error) {
+                console.log('Sin sesion previa o token expiro ' + error);
+            }
+            finally{
+                setLoading(false);
+            }
+        }//funcion
+
+        verificarSesion();
+    },[]);
+
+    //Definir el localStorage en el login
+    const login = (userData, userToken) => {
         setUser(userData);
+        setToken(userToken);
     }
 
     const updateUser = (newData) => {
         const updated = { ...user, ...newData };
-        localStorage.setItem("alumno", JSON.stringify(updated));
         setUser(updated);
     };
 
-    const logout = () => {
-        localStorage.removeItem("alumno");
-        setUser(null);
+    const logout = async() => {
+        try {
+            //RETIRAR LA COOKIE
+            await fetch(`${API_URL}/session/exit`,{
+                method: 'GET',
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error('Error al revocar la cookie ' + error);
+        }
+        finally{
+            setUser(null);
+            setToken(null);
+        }
     };
+
+    
+    if (loading) {
+        return (
+           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif' }}>
+                <h3>Comprobando credenciales seguras...</h3>
+            </div>);
+    }
 
     return(
         <AuthContext.Provider value={{user, login, logout, updateUser}}>

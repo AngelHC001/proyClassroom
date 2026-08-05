@@ -15,16 +15,14 @@ html, body {
 
 
 .bg1 {
-    background-image: url("../src/assets/students.jpg");
-    background-color: rgb(222, 218, 213);
-    
+    background-image: url("../src/assets/tracenBg.png");
+    background-color: rgb(241, 221, 195);
+    opacity: 90%;
     height: 100%;
-
-    background-attachment: fixed;
+    background-attachment:fixed;
     background-repeat: no-repeat;
-    background-size: cover;
-
-    position: absolute;
+    background-size:cover;
+    position: absolute;    
 }
 
 textarea{

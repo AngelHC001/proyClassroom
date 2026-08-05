@@ -3,12 +3,13 @@ import { useView } from "./viewContext";
 import { usePostMutations } from "../genUser-actions/usePostMutations";
 import FileContainer from "./file_container";
 
-const APIURL = import.meta.env.VITE_API_URL;
 const opciones = {
     timeZone: "America/Mexico_City",
     day: "2-digit", month: "2-digit", year: "numeric",
     hour: "2-digit", minute: "2-digit", hour12: false // formato 24h
 };
+
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
 
 //AREA DE BOTONES
 const class_button = "btn btn-outline-light btn-sm border-0 rounded-circle"
@@ -83,20 +84,27 @@ function Post({PostData}){
 
     return(
         <div className="card border-0 post text-light me-2">
-            <div className="card-header border-light d-flex justify-content-between align-items-center">
-                { 
-                    isOnEdit ? 
-                        <div className="col-sm-6">
-                            <input className="form-control" type="text" name="newTitle"
-                                onChange={handleChange} value={editData.newTitle}/>  
+            <div className="card-header border-light d-flex align-items-center justify-content-between flex-wrap">
+                
+                    { 
+                        isOnEdit ? 
+                            <div className="card-title m-0">
+                                <input className="form-control" type="text" name="newTitle"
+                                    onChange={handleChange} value={editData.newTitle}/>  
+                            </div>
+                            : <h3 className="card-title m-0">{PostData?.titulo}</h3>
+                    }
+
+                    <div className="d-flex align-items-center gap-2">
+                        <img className="img-fluid rounded-circle" src={CLOUD_URL + PostData?.fotoremit} alt="fotoPerfil" 
+                            style={{width: 50, height:50, objectFit: 'contain'}}/>
+                        
+                        <div className="text-end">
+                            <div className="fw-bold">{PostData?.remitente}</div>
+                            <small className="mt-1">{fechaFormateada}</small>
                         </div>
-                        : <h3 className="col-sm-6">{PostData?.titulo}</h3>
-                }
-              
-                <div className="row col-sm-4 text-center">
-                    <span className="mb-1"><b>{PostData?.remitente}</b></span>
-                    <span className="border-top mt-1">{fechaFormateada}</span>
-                </div>
+                    </div>
+               
             </div>
             
             <div className="card-body">

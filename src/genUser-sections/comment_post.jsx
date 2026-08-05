@@ -11,10 +11,11 @@ import DisplayError from '../components/error_banner'
 
 import NoCommentYet from '../assets/no-comment-yet.webp'; 
 
-const APIURL = import.meta.env.VITE_API_URL; 
+const API_URL = import.meta.env.VITE_API_URL; 
+const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
 const keys = ["idPost", "titulo", "contenido", "fechahora","stringfiles", "likes", 
-                    "comentarios", "idUsuario", "matricula","remitente"];
-    
+                    "comentarios", "idUsuario", "matricula", "fotoremit", "remitente"];
+
 function CommentPost(){
     const { user } = useAuth();
     const { activeView, setActiveView } = useView();
@@ -34,7 +35,7 @@ function CommentPost(){
         
         queryFn: async() => {
             const controller = new AbortController();    
-            const response = await fetch(`${APIURL}/comments/fetch_comment/${values[0]}`,{
+            const response = await fetch(`${API_URL}/comments/fetch_comment/${values[0]}`,{
                 method:'GET',
                 signal: controller.signal
             });

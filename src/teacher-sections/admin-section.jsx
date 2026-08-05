@@ -15,21 +15,14 @@ const db_items = [
         sectionName: 'Control de Usuarios',
         piece: 'users_control'
     },
-     {
-        key: 'admin_item1',
-        icon: 'bi bi-person-circle',
-        sectionName: 'Mi Perfil',
-        piece: 'my_profile'
-    },
     {
-        key: 'admin_item3',
+        key: 'admin_item1',
         icon: 'bi bi-stickies-fill',
         sectionName: 'Post de Alumnos',
         piece: 'manage_posts'
     },
-   
     {
-        key: 'admin_item4',
+        key: 'admin_item2',
         icon: 'bi bi-file-zip-fill',
         sectionName: 'Archivos Enviados',
         piece: 'manage_files'
@@ -40,7 +33,6 @@ const db_items = [
 function AdminLeftBar(){
     const { activeView, setActiveView } = useView();
     
-
     return(
         <div className="col-md-4 left-side text-center p-3">
             <h2 className="display-6">Administrar Clase</h2>
@@ -60,16 +52,6 @@ function AdminLeftBar(){
                     <i className="bi bi-arrow-left-square"></i> Volver al Grupo
                 </Link>
             </div>    
-
-            <h3>Opciones para el Grupo</h3>
-            <form className="d-flex justify-content-center gap-2">
-                <button className="btn btn-success" name="export" type="submit">
-                    <i className="bi bi-download"></i> Guardar Actividad
-                </button>
-                <button className="btn btn-danger" name="clean" type="submit">
-                    <i className="bi bi-trash"></i> Limpiar Grupo
-                </button>
-            </form>
         </div>
     )
 }
@@ -79,7 +61,6 @@ function AdminRightBar(){
     return(
         <div className="col-md-8 right-side">
             {activeView.type === 'users_control' &&  <AdminControl/>}
-            {activeView.type === 'my_profile' && <EditSection/>}
             {activeView.type === 'manage_posts' && <PostContainer/>}
             {activeView.type === 'manage_files' && <AdminFiles/>} 
         </div>
@@ -87,7 +68,7 @@ function AdminRightBar(){
 }
 
 function AdminSection(){
-    const [activeView, setActiveView] = useState({type: 'my_profile'});
+    const [activeView, setActiveView] = useState({type: 'users_control'});
    
     return(
         <ViewContext.Provider value={{activeView, setActiveView}}>
