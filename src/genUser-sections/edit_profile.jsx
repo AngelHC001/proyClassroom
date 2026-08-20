@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {useAuth} from './AuthContext.jsx'
 import SectionHeader from "../components/section-header.jsx";
+import ModalNotification from "../components/modal_notif.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const CLOUD_URL = import.meta.env.VITE_CLOUDINARY_URL;
@@ -43,10 +44,12 @@ function ChangePic({setMessage}){
             clear(e);
             const data = await response.json();
             updateUser({ imgPerfil: data.newProf || user.imgPerfil });
-            setMessage('Foto de Perfil cambiada');
+           
+            setMessage('Foto de Perfil cambiada');         
+
         }catch(error){
             console.error(error.message);
-            setMessage('Algo salio mal') 
+            setMessage('Algo salio mal: ', error.message) 
         }
     }
 
@@ -69,7 +72,8 @@ function ChangePic({setMessage}){
                     onClick={clear} accept="image/*"/>
                 </label>
                     
-                <button className="btn btn-success border-0 btn-user btn-lg rounded-circle" type="submit" title="Guardar">
+                <button className="btn btn-success border-0 btn-user btn-lg rounded-circle" 
+                    type="submit" title="Guardar" id="liveAlertBtn">
                     <small><i className="text-light bi bi-floppy"/></small>
                 </button>
             </form>
@@ -147,7 +151,7 @@ function ChangeData({setMessage}){
                 <div className="input-group">
                     <label className="col-form-label me-1" htmlFor="matricula">Matricula:</label>
                     <input className="form-control" type="text" value={newData.matricula} 
-                    name="matricula" onChange={handleChange} required/>
+                    name="matricula" maxLength={9} onChange={handleChange} required/>
                 </div>
 
                 <div className="input-group">
@@ -185,14 +189,16 @@ function EditSection(){
         <div className="text-light">            
             <SectionHeader title={'Mi Perfil'} iconClass={'person-circle'}/>
             
-            <div className="p-3 justify-content-center">
-                {
-                    message && 
-                    <div className="alert alert-info alert-dismissible fade show" role="alert">
-                        {message}
-                    </div>
-                }
+            {
+                message && 
+                <div id="liveAlert" className="alert alert-info alert-dimissible" role="alert">
+                    {message}
+                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
 
+            <div className="p-3 justify-content-center">
+               
                 <div className="row">
                     <ChangePic setMessage={setMessage}/>
                     <ChangeData setMessage={setMessage}/>

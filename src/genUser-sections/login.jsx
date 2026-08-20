@@ -64,6 +64,15 @@ function Login(){
 
                     <button className="btn border-0 btn-success btn-user" type="submit">Entrar</button>
                 </form>
+                <div className="card-footer">
+                    <small>
+                        ¿Quieres Probar Rapidamente?
+                        <ul>
+                            <li>Matricula: GP-DEMO</li>
+                            <li>Contraseña: gUes17Teio-Oo-o</li>
+                        </ul>
+                    </small>
+                </div>
             </div>
         </LoginContainer>
        

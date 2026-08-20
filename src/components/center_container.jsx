@@ -11,6 +11,11 @@ function LoginContainer({children}){
             <div className="d-flex justify-content-center align-items-center">
                 {children}
             </div>
+
+            <br />
+            <small className="bg-light p-3 rounded">
+                Nota: Las credenciales del modo administrador están disponibles bajo solicitud para evitar alteraciones en la base de datos de pruebas.
+            </small>
         </div>
     )
 }

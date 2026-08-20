@@ -2,6 +2,7 @@ import express from 'express';
 
 import { pool } from './db_connection.js';
 import { upload, upload_cdy, delete_cdy, extractPublicId, extractRegistry } from './utils.js';
+import sanitize from 'sanitize-html';
 
 const router = express.Router();
 
@@ -22,12 +23,22 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
         const results = await Promise.all(uploadPromises);
         const chained = results.map((r) => extractRegistry(r.secure_url)).join('-');
 
+        const cleanTitle = sanitize(title,{
+            allowedTags: [],
+            allowedAttributes: {}
+        });
+
+        const cleanContent = sanitize(content,{
+            allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'li'],
+            allowedAttributes: {}
+        });
+
         const parsedUser = JSON.parse(remitent);
         const now = new Date(); 
         if(mode === 'feed'){
             //PROCESO NORMAL DE POSTS    
             await pool.query(`INSERT INTO POST (TITULO,CONTENIDO,FECHAHORA,STRINGFILES,"idUsuario")
-                            VALUES ($1, $2, $3, $4, $5)`,[title,content,now,chained,parsedUser.id]);  
+                            VALUES ($1, $2, $3, $4, $5)`,[cleanTitle,cleanContent,now,chained,parsedUser.id]);  
         }
         else if(mode === 'comment')
         {      
@@ -37,7 +48,7 @@ router.post('/upload_post', upload.array('images',5), async(req,res) => {
             }
 
             await pool.query(`INSERT INTO COMENTARIO (CONTENIDO,FECHAHORA,STRINGFILES,"idUsuario","idPost")
-                         VALUES ($1, $2, $3, $4, $5)`, [content,now,chained,parsedUser.id, postTarget]);
+                         VALUES ($1, $2, $3, $4, $5)`, [cleanContent,now,chained,parsedUser.id, postTarget]);
             
             //Actualizar comentarios de Post
             await pool.query('UPDATE POST SET COMENTARIOS = COMENTARIOS + 1 WHERE "idPost" = $1',[postTarget]);

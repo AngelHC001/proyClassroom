@@ -35,6 +35,11 @@ router.put('/change_picture', upload.single('newImg'), async(req,res) => {
 router.put('/rewrite_data', async(req,res) => {
     const { newData, user } = req.body;
 
+    if(!newData){ return res.status(400).json({message: 'SIN REQUISITOS PARA CAMBIOS'}); }
+    if(newData.matricula.length > 9){ 
+        return res.status(400).json({message: 'MATRICULA NO DEBE PASAR LOS 9 CARACTERES'});
+    }
+
     try {
         const params = []; 
         const setClauses = [];
