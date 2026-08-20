@@ -1,34 +1,49 @@
 ## 🎓ProyClassroom
-Aplicación web fullstack para gestión de aula virtual con React en el frontend y Express en el backend.
+Aplicación web FullStack inspirada en un chat grupal de Microsoft Teams, ambientada con la temática de la franquicia Umamusume Pretty Derby para simular las interacciones de los usuarios.
 
-## 🚀 Demo
+**¿Quieres Probar la app rapidamente?**
+Credenciales modo usuario:
+ - Matricula: GP-DEMO
+ - Contraseña: gUes17Teio-Oo-o
 
- *Próximamente* 🟡 En desarrollo activo
+Las credenciales del modo administrador están disponibles bajo solicitud para evitar alteraciones en la base de datos de pruebas.
+
+## 🚀 Demo y Arquitectura
+https://proyclassroom.onrender.com/
 ---
+- Frontend y Backend: Desplegados en Render (Free Tier).
+- Base de Datos: PostgreSQL alojada en Aiven.
+- Almacenamiento de Medios: Cloudinary v2 (para la gestión exclusiva de imágenes en publicaciones y comentarios).
 
-### Estructura
-- src: componentes e interfaces de usuario, incluyendo autenticación, perfil, publicaciones, comentarios y panel de administración.
-- routes: rutas del servidor para manejar sesión, usuarios, posts, comentarios y archivos.
-- public: datos de usuario y archivos subidos.
-- server.js: servidor Express principal.
-- vite.config.js: configuración de Vite para desarrollo rápido.
+Nota técnica: El repositorio cuenta con una rama main configurada originalmente para SQL Server. Sin embargo, debido a limitaciones de costos y barreras de infraestructura en el free tier, se implementó y adaptó la rama postgre-mode para garantizar una alta disponibilidad de despliegue en la nube.
 
-### Funcionalidades
-- 🔐 Autenticación y autorización de usuarios
-- 📝 Gestión de perfiles y edición de datos.
-- Creación y visualización de publicaciones.
-- Comentarios en posts y sección de administración de contenido.
-- Subida de archivos y manejo de datos de usuario.
-- 👥 Soporte para roles administrativos/maestros.
-
+---
 ### 🛠️ Tecnologías utilizadas
-- `react`, `react-dom`, `react-router-dom`
-- `@tanstack/react-query`, `@tanstack/react-query-devtools`
-- `express`, `cors`, `mssql`, `multer`, `bcrypt`
+Frontend
+ReactJS & React Router DOM (Enrutamiento y vistas de usuario)
 
-### Base de datos
-- **SQL Server** — Almacenamiento y gestión de datos relacionales
+@tanstack/react-query & Devtools (Gestión de estado servidor y caché)
 
+Backend & Base de Datos
+Node.js con Express (API RESTful)
+
+PostgreSQL & pg (Base de datos relacional)
+
+Bcrypt & JWT (Autenticación y seguridad de contraseñas)
+
+Multer & Cloudinary (Gestión de subida de archivos multimedia)
+
+---
+### Funcionalidades Principales
+🔐 Sistema de Autenticación: Registro, login seguro y autorización mediante tokens (JWT).
+
+📝 Gestión de Perfiles: Edición de datos de usuario e imagen de perfil.
+
+💬 Interactividad Social: Creación de publicaciones, sección de comentarios y administración de contenido.
+
+🖼️ Multimedia Integrada: Subida de imágenes optimizada y limitada exclusivamente a posts y comentarios mediante Cloudinary.
+
+👥 Roles de Usuario: Soporte para roles administrativos o de "maestros" dentro de la plataforma.
 
 ## 📁 Estructura del proyecto
 
@@ -53,8 +68,6 @@ proyClassroom/
 |   ├── index.css
 │   └── main.jsx
 |
-├── .env.development
-├── .env.production
 ├── .gitignore
 ├── eslint.config.js
 ├── index.html
@@ -65,10 +78,6 @@ proyClassroom/
 └── vite.config.js
 
 ```
----
-
-### Valor agregado
-Aplicación moderna que integra frontend reactivo con backend REST, manejo de datos en SQL y experiencia de usuario para gestión educativa en línea.
 
 ## 👤 Autor
 
@@ -76,7 +85,6 @@ Aplicación moderna que integra frontend reactivo con backend REST, manejo de da
 [GitHub](https://github.com/AngelHC001)
 
 ---
-
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
