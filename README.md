@@ -2,13 +2,11 @@
 Aplicación web FullStack inspirada en la dinámica de un chat grupal de canales de Microsoft Teams, ambientada con la temática de la franquicia Umamusume Pretty Derby para simular las interacciones de los usuarios.
 
 **¿Quieres Probar la app rapidamente?**
-- Credenciales modo usuario:
--   Matricula: GP-DEMO
--   Contraseña: gUes17Teio-Oo-o
+Credenciales modo usuario:
+ - Matricula: GP-DEMO
+ - Contraseña: gUes17Teio-Oo-o
 
-- Credenciales modo ADMIN:
--   Matricula: ADMIN
--   Contraseña: Um4yvru_ma1n
+Las credenciales del modo administrador están disponibles bajo solicitud para evitar alteraciones en la base de datos de pruebas.
 
 ## 🚀 Demo y Arquitectura
 https://proyclassroom.onrender.com/
